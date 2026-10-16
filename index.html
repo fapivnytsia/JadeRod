@@ -1,0 +1,1508 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Нефритовый стержень</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Manrope:wght@400;500;600;700;800&family=Ma+Shan+Zheng&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: sepia propaganda-poster backdrop (sunburst, star, palace, factories, wheat) behind everything; purse on top, a translucent stage with the jade rod and lanterns, prayer-bead and rhythm meters below; shop and stats in a right rail on wide screens */
+:root{
+  --ink:#181411;
+  --poster-red:#3d342c;
+  --poster-red-d:#1a1512;
+  --poster-ray:#4a3f35;
+  --poster-mount:#5c4e41;
+  --cream:#ece0c4;
+  --cream-d:#c9b48e;
+  --sil:#2b231e;
+  --sil-2:#382e27;
+  --sil-3:#1f1915;
+  --flag:#b8925a;
+
+  --panel:rgba(30,25,21,.86);
+  --panel-solid:#1e1915;
+  --panel-2:#2c251f;
+  --stage-bg:rgba(18,14,12,.24);
+  --line:rgba(236,224,196,.14);
+  --jade-dd:#073b2c;
+  --jade-d:#0f5a44;
+  --jade:#2c9c74;
+  --jade-l:#93e2bd;
+  --jade-glow:rgba(84,226,168,.55);
+  --gold:#e4b65a;
+  --gold-d:#9b7128;
+  --gold-l:#fbe3a4;
+  --silk:#c3283b;
+  --silk-d:#7a1121;
+  --silk-l:#ef5a63;
+  --warn:#ff7a5c;
+  --text:#f4ead8;
+  --dim:#c2b199;
+  --on-gold:#2a1c05;
+
+  --f-display:"Yeseva One",Georgia,"Times New Roman",serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-han:"Ma Shan Zheng","KaiTi","STKaiti",serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+html,body{min-height:100%}
+body{background:var(--ink);color:var(--text);font:400 15px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+
+#bg,#petals{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+
+.app{
+  position:relative;z-index:1;
+  max-width:1100px;margin:0 auto;
+  padding-block:12px 28px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:grid;gap:14px;grid-template-areas:"top" "play" "side";
+}
+@media (min-width:900px){
+  .app{grid-template-columns:minmax(0,1fr) 360px;grid-template-areas:"top top" "play side";column-gap:24px;padding-block:20px 32px}
+}
+
+/* header */
+.top{grid-area:top;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.seal{
+  flex:none;width:42px;height:42px;display:grid;place-items:center;border-radius:6px;
+  background:var(--gold);color:var(--sil-3);font:400 30px/1 var(--f-han);
+  box-shadow:inset 0 0 0 2px var(--gold-d), inset 0 0 0 4px var(--gold), 0 4px 14px rgba(40,0,0,.45);transform:rotate(-4deg);
+}
+.brand h1{margin:0;font:400 clamp(19px,4.6vw,26px)/1.05 var(--f-display);text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.brand small{display:block;margin-top:3px;font:600 11px var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.tools{display:flex;gap:8px;flex:none}
+.ibtn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:40px;min-width:40px;padding:0 11px;
+  border-radius:12px;border:1px solid var(--line);background:var(--panel);cursor:pointer;
+}
+.ibtn:hover{border-color:var(--jade)}
+.ibtn:focus-visible,.item:focus-visible,.btn:focus-visible{outline:2px solid var(--jade-l);outline-offset:2px}
+.ibtn svg{width:18px;height:18px}
+.ibtn[aria-pressed="false"] .wave{display:none}
+.ibtn[aria-pressed="true"] .mute{display:none}
+
+.play{grid-area:play;display:grid;gap:12px;min-width:0}
+.side{grid-area:side;display:grid;gap:14px;align-content:start;min-width:0}
+
+/* purse */
+.purse{display:grid;justify-items:center;gap:4px;text-align:center;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+.amount{display:flex;align-items:center;gap:10px}
+.amount svg{width:clamp(30px,8vw,40px);height:clamp(30px,8vw,40px);color:var(--gold);filter:drop-shadow(0 4px 12px rgba(228,182,90,.35))}
+.amount svg.bump{animation:cbump .35s}
+@keyframes cbump{40%{transform:scale(1.25) rotate(-12deg)}}
+#coins{font:400 clamp(40px,11vw,60px)/1 var(--f-display);font-variant-numeric:tabular-nums;color:var(--gold-l)}
+.sub{font:600 12px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.sub b{color:var(--jade-l);font-weight:700}
+.quote{margin:4px 0 0;max-width:34ch;min-height:2.9em;font:italic 400 14px/1.45 var(--f-body);color:var(--dim);text-wrap:balance;transition:opacity .4s}
+.quote.fade{opacity:0}
+
+/* stage */
+.stage{
+  position:relative;height:clamp(380px,56vh,620px);border-radius:24px;overflow:hidden;
+  background:
+    radial-gradient(45% 45% at 50% 50%, rgba(44,156,116,calc(.06 + var(--heat,0) * .28)) 0%, transparent 100%),
+    var(--stage-bg);
+  -webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);
+  border:1px solid var(--line);
+  touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;
+  --heat:0;--cy:50%;--clothY:200px;--tilt:0deg;
+}
+.stage:active{cursor:grabbing}
+.stage:focus-visible{outline:2px solid var(--jade-l);outline-offset:3px}
+.watermark{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font:400 clamp(260px,62vh,520px)/1 var(--f-han);color:var(--jade);opacity:.07}
+
+/* lanterns */
+.lantern{position:absolute;top:0;width:44px;pointer-events:none;transform-origin:50% 0;animation:sway 4.5s ease-in-out infinite}
+.lantern.l{left:clamp(10px,6%,40px)}
+.lantern.r{right:clamp(10px,6%,40px);animation-delay:-2.2s;animation-duration:5.2s}
+.lantern .cord{display:block;width:2px;height:var(--cord,26px);margin:0 auto;background:var(--gold-d)}
+.lantern .cap1,.lantern .cap2{display:block;width:24px;height:6px;margin:0 auto;border-radius:2px;background:var(--gold)}
+.lantern .body{
+  display:block;width:44px;height:52px;border-radius:46%;position:relative;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 8px, rgba(90,10,20,.35) 8px 9px),
+    radial-gradient(circle at 50% 45%, #ffb07a 0%, var(--silk-l) 30%, var(--silk) 62%, var(--silk-d) 100%);
+  box-shadow:0 0 30px rgba(255,90,80,.45), 0 0 60px rgba(255,140,90,.2);
+}
+.lantern .body::after{content:"福";position:absolute;inset:0;display:grid;place-items:center;font:400 20px/1 var(--f-han);color:var(--gold-l);opacity:.9}
+.lantern .tas{display:block;width:6px;height:22px;margin:0 auto;border-radius:2px 2px 3px 3px;background:repeating-linear-gradient(90deg,var(--silk) 0 2px,var(--silk-d) 2px 3px)}
+.lantern.r .body::after{content:"財"}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+
+.rodWrap{
+  position:absolute;left:0;right:0;top:40px;bottom:58px;pointer-events:none;--rw:clamp(54px,15vw,72px);
+  --r-l:var(--jade-l);--r-m:var(--jade);--r-d:var(--jade-d);--r-vein:rgba(4,40,28,.55);--r-glow:84,226,168;
+  --c-1:var(--silk);--c-2:var(--silk-d);--c-3:var(--silk-l);--c-trim:rgba(228,182,90,.55);
+}
+.stage.white-jade .rodWrap{--r-l:#ffffff;--r-m:#e6eadf;--r-d:#b9c2b0;--r-vein:rgba(120,130,110,.35);--r-glow:240,248,230}
+.stage.gold-cloth .rodWrap{--c-1:var(--gold);--c-2:var(--gold-d);--c-3:var(--gold-l);--c-trim:rgba(194,40,59,.7)}
+.rod{
+  position:absolute;left:50%;top:10px;bottom:10px;width:var(--rw);transform:translateX(-50%);border-radius:calc(var(--rw) / 2);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.08) 16%, rgba(255,255,255,.26) 30%, rgba(255,255,255,.06) 42%, transparent 64%, rgba(0,0,0,.25) 84%, rgba(0,0,0,.6) 100%),
+    radial-gradient(40% 9% at 30% 18%, color-mix(in srgb, var(--r-l) 45%, transparent), transparent 70%),
+    radial-gradient(55% 7% at 70% 34%, var(--r-vein), transparent 70%),
+    radial-gradient(35% 10% at 40% 52%, color-mix(in srgb, var(--r-l) 35%, transparent), transparent 70%),
+    radial-gradient(60% 6% at 62% 66%, var(--r-vein), transparent 70%),
+    radial-gradient(45% 9% at 34% 82%, color-mix(in srgb, var(--r-l) 40%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--r-m) 0%, var(--r-d) 30%, var(--r-m) 55%, var(--r-d) 80%, var(--r-m) 100%);
+  box-shadow:0 0 calc(8px + var(--heat) * 60px) rgba(var(--r-glow),calc(.18 + var(--heat) * .55)), 0 18px 40px -10px rgba(0,0,0,.7);
+}
+.rod::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(180deg, transparent 27%, var(--r-vein) 27.4%, rgba(255,255,255,.22) 28.2%, transparent 28.6%, transparent 71.4%, var(--r-vein) 71.8%, rgba(255,255,255,.22) 72.6%, transparent 73%);
+}
+.rod::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;mix-blend-mode:screen;
+  background:radial-gradient(70% 22% at 38% var(--cy), rgba(235,255,245,calc(.12 + var(--heat) * .75)), transparent 75%);
+}
+.cap{
+  position:absolute;left:50%;width:calc(var(--rw) + 16px);height:26px;transform:translateX(-50%);border-radius:10px;
+  background:repeating-linear-gradient(90deg, transparent 0 6px, rgba(90,60,10,.25) 6px 7px), linear-gradient(180deg, var(--gold-l) 0%, var(--gold) 40%, var(--gold-d) 100%);
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.25), 0 6px 14px rgba(0,0,0,.45);
+}
+.cap.t{top:0}
+.cap.b{bottom:0}
+.cap.t::after{content:"";position:absolute;left:50%;top:-10px;width:18px;height:14px;transform:translateX(-50%);border-radius:50% 50% 4px 4px;background:linear-gradient(180deg,var(--gold-l),var(--gold-d))}
+.tassel{position:absolute;left:calc(50% + var(--rw) / 2 + 2px);bottom:-30px;width:14px;height:70px;transform-origin:50% 0;transform:rotate(calc(-12deg + var(--tilt) * -1.4));transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.tassel::before{content:"";position:absolute;left:5px;top:0;width:3px;height:22px;background:var(--silk);border-radius:2px}
+.tassel::after{content:"";position:absolute;left:0;top:20px;width:14px;height:44px;border-radius:7px 7px 3px 3px;background:repeating-linear-gradient(90deg, var(--silk) 0 2px, var(--silk-d) 2px 3px);box-shadow:inset 0 5px 0 var(--gold)}
+.cloth{
+  position:absolute;left:50%;top:0;width:calc(var(--rw) + 46px);height:66px;
+  transform:translate(-50%, calc(var(--clothY) - 50%)) rotate(var(--tilt));
+  border-radius:16px 22px 14px 24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.22), transparent 30%, rgba(0,0,0,.25) 100%),
+    repeating-linear-gradient(104deg, var(--c-1) 0 9px, var(--c-2) 9px 12px, var(--c-3) 12px 13px, var(--c-1) 13px 22px);
+  box-shadow:0 10px 22px rgba(0,0,0,.5), inset 0 0 0 2px var(--c-trim), inset 0 0 0 5px var(--c-1);
+  will-change:transform;
+}
+.cloth::before,.cloth::after{content:"";position:absolute;width:20px;height:30px;bottom:-12px;border-radius:0 0 10px 10px;background:var(--c-2)}
+.cloth::before{left:6px;transform:rotate(14deg)}
+.cloth::after{right:6px;transform:rotate(-14deg)}
+.cloth.squish{animation:squish .16s}
+@keyframes squish{50%{scale:1.06 .9}}
+
+.hint{position:absolute;left:calc(50% + clamp(56px,13vw,72px));top:50%;transform:translateY(-50%);display:grid;justify-items:center;gap:6px;pointer-events:none;color:var(--jade-l);font:700 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase;transition:opacity .5s}
+.hint svg{width:30px;height:64px;animation:hint 1.4s ease-in-out infinite}
+@keyframes hint{0%,100%{transform:translateY(-12px)}50%{transform:translateY(12px)}}
+.hint.off{opacity:0}
+
+.banner{position:absolute;left:50%;top:22%;z-index:3;pointer-events:none;width:88%;text-wrap:balance;text-align:center;font:400 clamp(24px,6.5vw,38px)/1.1 var(--f-display);color:var(--gold-l);text-shadow:0 0 26px rgba(228,182,90,.6);opacity:0;transform:translate(-50%,0) scale(.7)}
+.banner small{display:block;font:700 11px var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--jade-l);margin-bottom:4px}
+.banner.show{animation:banner 2.2s ease forwards}
+@keyframes banner{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}12%{opacity:1;transform:translate(-50%,0) scale(1.05)}22%{transform:translate(-50%,0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px) scale(1)}}
+
+.tempoTag{
+  position:absolute;left:50%;bottom:16px;transform:translateX(-50%);padding:6px 13px;border-radius:999px;max-width:calc(100% - 24px);
+  font:800 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:var(--panel-solid);color:var(--dim);border:1px solid var(--line);opacity:0;transition:opacity .25s, background .25s, color .25s;pointer-events:none;
+}
+.stage[data-tempo] .tempoTag{opacity:1}
+.stage[data-tempo="ok"] .tempoTag{background:var(--jade-l);color:var(--jade-dd);border-color:var(--jade-l)}
+.stage[data-tempo="cold"] .tempoTag{color:var(--gold-l);border-color:var(--gold-d)}
+.stage[data-tempo="fast"] .tempoTag{background:var(--warn);color:var(--on-gold);border-color:var(--warn)}
+
+/* meters */
+.meters{display:grid;gap:10px;grid-template-columns:1fr;padding:12px 14px;border-radius:18px;background:var(--panel);border:1px solid var(--line)}
+@media (min-width:560px){.meters{grid-template-columns:1fr 1fr;gap:18px}}
+.meter{display:grid;gap:6px}
+.mh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font:700 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.mh b{font:700 12px var(--f-mono);letter-spacing:0;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.beads{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;align-items:center;position:relative}
+.beads::before{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;background:var(--silk-d);transform:translateY(-50%)}
+.bead{position:relative;aspect-ratio:1;max-width:24px;width:100%;justify-self:center;border-radius:50%;background:radial-gradient(circle at 35% 30%, #2a3a35, #121c19);box-shadow:inset 0 0 0 1px var(--line);transition:background .2s, transform .2s}
+.bead.on{background:radial-gradient(circle at 35% 30%, var(--jade-l), var(--jade) 55%, var(--jade-d));box-shadow:0 0 10px var(--jade-glow);transform:scale(1.08)}
+.beads.draining .bead.on:last-of-type, .beads.draining .bead.edge{animation:burn .7s ease-in-out infinite}
+@keyframes burn{50%{background:radial-gradient(circle at 35% 30%, var(--gold-l), var(--warn) 60%, var(--silk-d))}}
+.qi{position:relative;height:14px;border-radius:7px;background:var(--panel-2);overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.qi .zone{position:absolute;top:0;bottom:0;background:rgba(147,226,189,.14);border-left:2px solid var(--jade-l);border-right:2px dashed var(--warn)}
+.qi i{position:relative;display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--jade-d),var(--jade),var(--jade-l));transition:width .12s linear;opacity:.9}
+.qi.fast i{background:linear-gradient(90deg,var(--jade),var(--gold),var(--warn))}
+.qnote{font-size:12px;color:var(--dim)}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.panel h2{margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:8px;font:400 19px var(--f-display)}
+.panel h2 span{font:700 11px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:right}
+.panel h3{margin:6px 0 0;font:700 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.shop{display:grid;gap:8px}
+.item{
+  display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:2px 12px;align-items:center;text-align:left;
+  padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .2s, transform .1s;
+}
+.item:not(:disabled):hover{border-color:var(--gold-d)}
+.item:not(:disabled):active{transform:scale(.985)}
+.item:disabled{cursor:not-allowed}
+.item:disabled .cost{opacity:.5}
+.item.maxed .cost{opacity:1;background:transparent;color:var(--jade-l)}
+.item .ic{grid-row:span 2;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--ink);color:var(--jade-l)}
+.item .ic svg{width:24px;height:24px}
+.item .nm{font:700 14px var(--f-body);min-width:0}
+.item .nm em{font:600 11px var(--f-mono);font-style:normal;color:var(--jade-l);margin-left:6px}
+.item .ds{grid-column:2;font-size:12px;color:var(--dim);min-width:0}
+.item .cost{grid-row:1 / span 2;grid-column:3;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:10px;background:var(--ink);font:700 13px var(--f-mono);color:var(--gold-l);font-variant-numeric:tabular-nums;white-space:nowrap}
+.item .cost svg{width:14px;height:14px;color:var(--gold)}
+.item.can{border-color:rgba(228,182,90,.45)}
+.item.can .cost{background:var(--gold);color:var(--on-gold)}
+.item.can .cost svg{color:var(--on-gold)}
+.item.flash{animation:buy .45s}
+@keyframes buy{30%{background:rgba(228,182,90,.18)}}
+
+.stats{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:0;font-size:13px}
+.stats dt{color:var(--dim)}
+.stats dd{margin:0;font:600 13px var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.rankbar{height:6px;border-radius:3px;background:var(--panel-2);overflow:hidden}
+.rankbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width .4s}
+.btn{min-height:48px;padding:8px 14px;border-radius:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font:800 14px var(--f-body);border:1.5px solid var(--gold-d);background:var(--panel-2)}
+.btn svg{width:18px;height:18px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:70;transform:translate(-50%,20px);padding:10px 16px;border-radius:12px;background:var(--jade-l);color:var(--jade-dd);font:700 14px var(--f-body);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.float{position:absolute;z-index:4;pointer-events:none;font:800 18px var(--f-body);color:var(--gold-l);text-shadow:0 2px 8px rgba(0,0,0,.6);animation:flt 1s ease-out forwards}
+@keyframes flt{0%{opacity:0;transform:translate(-50%,6px) scale(.7)}15%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-44px) scale(1)}}
+
+@media (min-width:900px){ [data-pane="path"] .qnote{display:none!important} }
+/* phone: one screen + bottom sheet */
+.dock,.sheetHead,.scrim{display:none}
+@media (max-width:899px){
+  body{overscroll-behavior:none}
+  .app{grid-template-areas:"top" "play" "dock";gap:10px;padding-block:8px 10px}
+  .seal{width:34px;height:34px;font-size:24px}
+  .brand h1{font-size:18px}
+  .brand small{display:none}
+  .ibtn{min-height:38px;min-width:38px}
+  .purse{gap:2px}
+  #coins{font-size:clamp(34px,10vw,46px)}
+  .quote{font-size:13px;min-height:0;margin-top:2px}
+  .stage{border-radius:20px}
+  .rodWrap{top:30px;bottom:52px}
+  .meters{padding:10px 12px;gap:8px}
+  .qnote{display:none}
+  .toast{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+
+  .dock{grid-area:dock;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .dockBtn{position:relative;min-height:50px;background:var(--panel);border-color:var(--line);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);touch-action:manipulation}
+  .dockBtn .dot{position:absolute;top:9px;right:12px;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(228,182,90,.25)}
+
+  .scrim{display:block;position:fixed;inset:0;z-index:40;background:rgba(4,8,7,.6);opacity:0;transition:opacity .25s}
+  .scrim.on{opacity:1}
+  .side{
+    position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:min(82dvh,680px);overflow:auto;overscroll-behavior:contain;gap:4px;
+    padding:0 max(12px, env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(12px, env(safe-area-inset-left,0px));
+    background:var(--panel-solid);border-radius:22px 22px 0 0;border-top:1px solid var(--line);box-shadow:0 -20px 50px rgba(0,0,0,.55);
+    transform:translateY(105%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.3,1), visibility 0s .32s;
+  }
+  .side.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.9,.3,1), visibility 0s}
+  .side .panel{background:transparent;border:0;padding:4px 2px;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .side[data-tab="shop"] [data-pane="path"],.side[data-tab="path"] [data-pane="shop"]{display:none}
+  .sheetHead{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 10px;position:sticky;top:0;z-index:1;padding:8px 0 10px;background:var(--panel-solid)}
+  .grab{grid-column:1 / -1;justify-self:center;width:40px;height:4px;border-radius:2px;background:var(--line)}
+  .tabs{display:flex;gap:6px}
+  .tab{min-height:40px;padding:0 16px;border-radius:11px;border:1px solid var(--line);background:transparent;cursor:pointer;font:700 14px var(--f-body);color:var(--dim)}
+  .tab[aria-selected="true"]{background:var(--panel-2);color:var(--text);border-color:var(--gold-d)}
+  .tab:focus-visible{outline:2px solid var(--jade-l);outline-offset:2px}
+}
+@media (max-width:899px) and (min-height:560px){
+  html{box-sizing:border-box;height:100%}
+  body{height:100%;overflow:hidden}
+  .app{height:100%;display:flex;flex-direction:column}
+  .top,.dock{flex:none}
+  .play{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+  .purse,.meters{flex:none}
+  .stage{flex:1 1 auto;height:auto;min-height:220px}
+}
+@media (max-width:899px) and (max-height:740px){
+  .quote{display:none}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .side,.side.open{transition:none}
+  .hint svg,.cloth.squish,.lantern,.beads.draining .bead{animation:none}
+  .tassel{transition:none}
+}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="coin" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M10 .8a9.2 9.2 0 1 1 0 18.4A9.2 9.2 0 0 1 10 .8zM7.6 7.6v4.8h4.8V7.6z"/><circle cx="10" cy="10" r="7" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="1"/></symbol>
+</svg>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<canvas id="petals" aria-hidden="true"></canvas>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="seal" aria-hidden="true">玉</span>
+      <div>
+        <h1>Нефритовый стержень</h1>
+        <small>держи темп и богатей</small>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="ibtn" id="sndBtn" type="button" aria-pressed="true" aria-label="Звук">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="mute" d="m16 9 6 6m0-6-6 6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="play">
+    <section class="purse" aria-live="polite">
+      <div class="amount">
+        <svg id="coinIcon" aria-hidden="true"><use href="#coin"/></svg>
+        <span id="coins">0</span>
+      </div>
+      <div class="sub"><span id="rankName">Послушник</span> · мазков <b id="strokes">0</b></div>
+      <p class="quote" id="quote">Нефрит без полировки не станет сокровищем.</p>
+    </section>
+
+    <section class="stage" id="stage" tabindex="0" aria-label="Стержень. Води вверх и вниз пальцем или мышью, либо нажимай стрелки вверх и вниз">
+      <div class="watermark" aria-hidden="true">玉</div>
+      <div class="lantern l" style="--cord:18px" aria-hidden="true"><span class="cord"></span><span class="cap1"></span><span class="body"></span><span class="cap2"></span><span class="tas"></span></div>
+      <div class="lantern r" style="--cord:38px" aria-hidden="true"><span class="cord"></span><span class="cap1"></span><span class="body"></span><span class="cap2"></span><span class="tas"></span></div>
+      <div class="rodWrap" id="rodWrap" aria-hidden="true">
+        <div class="rod" id="rod"></div>
+        <div class="cap t"></div>
+        <div class="cap b"><span class="tassel"></span></div>
+        <div class="cloth" id="cloth"></div>
+      </div>
+      <div class="hint" id="hint" aria-hidden="true">
+        <svg viewBox="0 0 30 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4v56M6 13l9-9 9 9M6 51l9 9 9-9"/></svg>
+        <span>води</span>
+      </div>
+      <div class="banner" id="banner" aria-hidden="true"></div>
+      <div class="tempoTag" id="tempoTag" aria-live="polite"></div>
+    </section>
+
+    <section class="meters">
+      <div class="meter">
+        <div class="mh"><span>До монеты</span><b id="progTxt">0 / 10</b></div>
+        <div class="beads" id="beads"></div>
+      </div>
+      <div class="meter">
+        <div class="mh"><span>Темп</span><b id="spsTxt">0,0 мазка/с</b></div>
+        <div class="qi" id="qi"><span class="zone" id="zone"></span><i id="qiFill"></i></div>
+        <div class="qnote" id="qnote">Зелёная зона — монеты капают. Ниже — бусины сгорают.</div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="dock" aria-label="Меню">
+    <button class="btn dockBtn" id="openShop" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-1.5 11h-15z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>
+      Лавка<span class="dot" id="shopDot" hidden></span>
+    </button>
+    <button class="btn dockBtn" id="openPath" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 9 4l4 10 3-5 4 11"/></svg>
+      Путь
+    </button>
+  </nav>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="side" id="side" data-tab="shop" aria-label="Лавка и путь">
+    <div class="sheetHead">
+      <span class="grab" aria-hidden="true"></span>
+      <div class="tabs" role="tablist">
+        <button class="tab" type="button" role="tab" data-tab="shop" aria-selected="true">Лавка</button>
+        <button class="tab" type="button" role="tab" data-tab="path" aria-selected="false">Путь</button>
+      </div>
+      <button class="ibtn" id="sheetClose" type="button" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <section class="panel" data-pane="shop">
+      <h2>Лавка мастера <span id="perCoin">10 мазков = 1</span></h2>
+      <div class="shop" id="shop"></div>
+      <h3>Для красоты</h3>
+      <div class="shop" id="shopCos"></div>
+    </section>
+
+    <section class="panel" data-pane="path">
+      <h2>Путь</h2>
+      <p class="qnote" style="display:block;margin:0">Монеты капают только при ровном темпе: 1,5–7 мазков в секунду. Медленнее — бусины сгорают, быстрее — мазки не засчитываются.</p>
+      <dl class="stats">
+        <dt>Ранг</dt><dd id="stRank">1 из 80</dd>
+        <dt>Ступень</dt><dd id="stStage">Двор храма</dd>
+        <dt>До следующего</dt><dd id="stNext">100</dd>
+      </dl>
+      <div class="rankbar"><i id="rankFill"></i></div>
+      <dl class="stats">
+        <dt>Всего мазков</dt><dd id="stStrokes">0</dd>
+        <dt>Монет заработано</dt><dd id="stEarned">0</dd>
+        <dt>Монет потрачено</dt><dd id="stSpent">0</dd>
+        <dt>Лучшая серия в темпе</dt><dd id="stStreak">0 мазков</dd>
+      </dl>
+    </section>
+  </aside>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+import * as Rules from './rules.js?v=2';
+
+(() => {
+  const $ = s => document.querySelector(s);
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const nfFull = new Intl.NumberFormat('ru-RU');
+  const nfShort = new Intl.NumberFormat('ru-RU', { notation: 'compact', maximumFractionDigits: 1 });
+  const fmt = n => n < 1e6 ? nfFull.format(Math.floor(n)) : nfShort.format(n);
+  const dec = (n, d = 1) => n.toFixed(d).replace('.', ',');
+
+  // ---------- economy ----------
+  // Tempo, ranks and shop prices live in rules.js: the game server counts by the same file
+  const { STROKES_PER_COIN, TEMPO_MAX, STAGES, RANKS } = Rules;
+  const MIN_PASS = 0.22;    // share of the rod one pass must cover
+  const HYST = 0.035;       // backward movement that counts as a direction change
+  const TEMPO_SCALE = 8;    // right edge of the tempo bar
+
+  const ITEMS = [
+    { id: 'silk', name: 'Шёлковый платок', desc: '+10% к монетам за уровень',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6c3-2 5 2 8 0s5-2 8 0v12c-3-2-5 2-8 0s-5-2-8 0z"/><path d="M8 9v7M16 9v7"/></svg>' },
+    { id: 'oil', name: 'Масло лотоса', desc: 'Нижняя граница темпа −0,2, бусины сгорают медленнее',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg>' },
+    { id: 'emp', name: 'Печать императора', desc: '+25% к монетам за печать',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/><path d="M9 15.5h6"/></svg>' }
+  ];
+  const COSMETICS = [
+    { id: 'goldCloth', name: 'Золотой платок', cls: 'gold-cloth',
+      desc: 'Только красота, монет не добавляет',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6c3-2 5 2 8 0s5-2 8 0v12c-3-2-5 2-8 0s-5-2-8 0z"/><path d="m12 9 1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L9 11.3l2-.3z"/></svg>' },
+    { id: 'whiteJade', name: 'Белый нефрит', cls: 'white-jade',
+      desc: 'Императорский белый стержень. Только красота',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="18" rx="3"/><path d="M7 5h10M7 19h10"/></svg>' }
+  ];
+  const ALL = [...ITEMS, ...COSMETICS].map(it => Object.assign(it, Rules.ITEMS.find(x => x.id === it.id)));
+
+  const QUOTES = [
+    "Нефрит без полировки не станет сокровищем.",
+    "Путь в тысячу ли начинается с первого мазка.",
+    "Терпение и труд всё перетрут.",
+    "Река точит камень не силой, а постоянством.",
+    "Утром натирай стержень, вечером считай монеты.",
+    "Ритм важнее силы. Сила важнее лени.",
+    "Блестит не тот стержень, что дорог, а тот, что любим.",
+    "Кто остановился, у того бусины сгорают.",
+    "Слишком быстро — и мудрец перестаёт верить.",
+    "Мудрец не считает мазки. Мудрец считает монеты.",
+    "Не тот силён, кто трёт быстро, а тот, кто трёт ровно.",
+    "Ци течёт туда, куда направлен платок.",
+    "Лучший день для натирания был вчера. Второй лучший — сегодня.",
+    "Нефрит не спрашивает, зачем ты пришёл. Он просто ждёт платок.",
+    "Кто считает чужие монеты, тот не натирает свой стержень.",
+    "Мудрец натирает молча. Глупец рассказывает об этом в чате.",
+    "Тише едешь — бусины сгорают.",
+    "Не бойся медленного темпа. Бойся остановки.",
+    "Даже дракон начинал с маленькой чешуйки.",
+    "Стержень без ухода теряет блеск. И уважение.",
+    "Ладонь, знающая путь, не ищет карту.",
+    "Сто мазков без ритма не стоят десяти в ритме.",
+    "Сначала ты натираешь стержень. Потом стержень воспитывает тебя.",
+    "Гора не придёт к мудрецу. Мудрец берёт платок и идёт к горе.",
+    "Монета, заработанная честно, звенит громче.",
+    "Автокликер — путь без чести.",
+    "Император тоже когда-то путал верх и низ.",
+    "Не тот богат, у кого много монет, а тот, у кого блестит.",
+    "Утренний мазок бодрит, вечерний успокаивает, ночной вызывает вопросы.",
+    "Устала рука — смени руку. Так говорил Старый Ли.",
+    "Шёлк мягок, но точит нефрит.",
+    "Слишком сильно сжимаешь — теряешь ци.",
+    "Ритм — это когда бусины не сгорают.",
+    "Кто ищет лёгкий путь, находит пустой кошелёк.",
+    "Чай остыл — значит, натирал правильно.",
+    "Мастер не хвастается мазками. Мастер показывает блеск.",
+    "Терпение — горькое растение, но плоды его блестят.",
+    "Великий путь начинается с одного неловкого движения.",
+    "Падает лепесток сливы — пора натирать.",
+    "Луна смотрит на того, кто трудится ночью.",
+    "Не спеши, кузнечик. Монеты подождут.",
+    "Кто трёт сверху вниз, познает низ. Кто снизу вверх — верх. Мудрец знает оба.",
+    "Платок, брошенный на полпути, не полирует.",
+    "Соседи не поймут. Мудрецы поймут.",
+    "Сила не в скорости, а в возвращении.",
+    "Тысяча мазков — это всего лишь тысяча раз по одному.",
+    "Каждая сгоревшая бусина — урок.",
+    "Нефрит любит тех, кто возвращается.",
+    "Кто натирает в спешке, тот платит дважды.",
+    "Мудрость приходит вместе с мозолями.",
+    "В тихом пруду отражается блестящий стержень.",
+    "Хочешь узнать человека — посмотри, как он держит платок.",
+    "Ветра не видно, но бамбук гнётся. Ци не видно, но монеты капают.",
+    "Золото блестит само. Нефрит блестит от труда.",
+    "Не жалуйся на стержень, если не умеешь держать ритм.",
+    "Император дал печать. Ты дай темп.",
+    "Один мазок — случайность. Десять — монета. Тысяча — путь.",
+    "Чем выше гора, тем дольше натирать.",
+    "Скромный полировщик доживает до старейшины.",
+    "Не завидуй чужому блеску. Натирай свой.",
+    "Даже бессмертному нужен перерыв на чай.",
+    "Кто не ронял платок, тот не научился его поднимать.",
+    "Слова мудреца коротки. Мазки — длинны.",
+    "Монета любит тишину. И ритм.",
+    "Дракон спит, пока стержень не заблестит.",
+    "Ученик спрашивает «сколько ещё?». Мастер не спрашивает.",
+    "Масло лотоса не заменит упорства.",
+    "Кто натирает ради похвалы, получит только мозоли.",
+    "Полная луна — сильная ци.",
+    "Торопливый мазок подобен воробью: шумно и без толку.",
+    "Кто громко хвалится, у того тихий кошелёк.",
+    "Капля за каплей наполняется чаша. Мазок за мазком — кошелёк.",
+    "Не бывает плохого стержня. Бывает ленивый полировщик.",
+    "Сосна растёт медленно, но стоит веками.",
+    "Начни с малого. Закончи блеском.",
+    "Стержень не блестит — значит, ещё не время отдыхать.",
+    "Тигр не считает шаги. Тигр идёт.",
+    "Великие дела делаются руками, а не разговорами в чате.",
+    "Мудрец видит стержень и видит путь. Глупец видит только стержень.",
+    "Ци любит постоянство, монеты любят ци.",
+    "Когда ученик готов, платок появится.",
+    "Кто трёт с любовью, тот трёт дольше.",
+    "Река не спорит с камнем. Она его полирует.",
+    "Не бросай платок, когда до монеты одна бусина.",
+    "Девять бусин — ещё не монета.",
+    "Старый мастер помнит каждую сгоревшую бусину.",
+    "Скорость без ритма — суета.",
+    "Ритм без скорости — медитация. Тоже неплохо.",
+    "Хороший стержень как хороший друг: требует внимания.",
+    "Чем дольше натираешь, тем меньше вопросов задаёшь.",
+    "Кто смеётся над полировщиком, не видел его кошелька.",
+    "Мудрость не купишь в лавке. Платок — купишь.",
+    "Великий полировщик рождается в тишине и вырастает в ритме.",
+    "Не ищи монету под камнем. Ищи её в мазке.",
+    "Не знаешь, что делать, — натирай.",
+    "Нефрит холоден только для тех, кто его не натирал.",
+    "Вечером тень от стержня длиннее. Как и твоя серия.",
+    "Кто начал натирать в старости, всё равно успел.",
+    "Платок — твой меч. Стержень — твой путь.",
+    "Не спрашивай мудреца, сколько он натёр. Это неприлично.",
+    "Блеск виден издалека, мозоли — только вблизи.",
+    "Сегодняшний мазок — завтрашняя монета.",
+    "Даже горный ручей отдыхает зимой. Ты — нет.",
+    "Журавль стоит на одной ноге, чтобы руки были свободны для полировки.",
+    "Кто поймал ритм, тот поймал удачу.",
+    "Слава уходит, блеск остаётся.",
+    "Три вещи нельзя вернуть: слово, стрелу и сгоревшую бусину.",
+    "Чаша полна — пей чай. Стержень тускл — бери платок.",
+    "Ученик натирает стержень. Мастер натирает дух.",
+    "Не меряйся стержнями. Меряйся монетами.",
+    "Тихая рука — богатый дом.",
+    "Кто встал с рассветом, тот натёр больше.",
+    "Беспокойный ум — сбитый ритм.",
+    "Нет ничего мягче шёлка и твёрже нефрита. Их встреча рождает монету.",
+    "Мастер не спешит, но всегда успевает.",
+    "Когда стержень сияет, мудрец молчит.",
+    "У пути полировщика нет конца. Есть только ранги.",
+    "Сначала ритм, потом монеты, потом печати.",
+    "Старейшины тоже натирают. Просто не говорят об этом.",
+    "Где прошёл платок, там прошла удача.",
+    "Ни один дракон не заработал монету, лёжа на облаке.",
+    "Не путай усердие с суетой.",
+    "Хороший платок служит долго. Плохой — до первой лавки.",
+    "Монеты в чате — уважение в чате.",
+    "Нефритовый путь открыт всем, но доходят немногие.",
+    "Сгоревшая бусина не вернётся. Новая уже ждёт.",
+    "Кто держит ровный темп, обгоняет того, кто бежит.",
+    "Великий стержень не за один день натирается.",
+    "Ночь длинная, стержень терпеливый.",
+    "Сомневаешься — сделай ещё десять мазков.",
+    "Император правит Поднебесной. Ты правишь своим стержнем.",
+    "Закончил натирать — начни снова. Так завещали предки."
+  ];
+
+  const fresh = () => ({
+    coins: 0, earned: 0, spent: 0, strokes: 0, prog: 0, frac: 0, bestStreak: 0,
+    lv: Rules.freshLevels(), sound: true, quote: 0
+  });
+  let S = fresh();
+
+  const mult = () => Rules.mult(S.lv);
+  const tempoMin = () => Rules.tempoMin(S.lv);
+  const drainSec = () => Rules.drainSec(S.lv);
+  const cost = it => Rules.cost(it, S.lv);
+  const maxed = it => Rules.maxed(it, S.lv);
+  const rankIdx = (n = S.strokes) => Rules.rankIdx(n);
+
+  // ---------- save ----------
+  function apply(d) { const f = fresh(); S = { ...f, ...d, lv: Rules.levels(d.lv) }; }
+  function load() { try { const d = JSON.parse(localStorage.getItem('jade.save.v2') || 'null'); if (d && typeof d.coins === 'number') apply(d); } catch (e) {} }
+  function save() {
+    try {
+      localStorage.setItem('jade.sound', S.sound ? '1' : '0');
+      if (keepLocal) localStorage.setItem('jade.save.v2', JSON.stringify(S));
+    } catch (e) {}
+  }
+  function loadSound() { try { const v = localStorage.getItem('jade.sound'); if (v !== null) S.sound = v === '1'; } catch (e) {} }
+
+  // ---------- audio ----------
+  let ac = null;
+  function audio() {
+    if (!S.sound) return null;
+    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; }
+    catch (e) { return null; }
+  }
+  function swish(up, ok) {
+    const a = audio(); if (!a) return;
+    const len = Math.floor(a.sampleRate * 0.16);
+    const buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) { const k = i / len; d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * k) * 0.9; }
+    const src = a.createBufferSource(); src.buffer = buf;
+    const f = a.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.4;
+    const t = a.currentTime;
+    f.frequency.setValueAtTime(up ? 900 : 1500, t);
+    f.frequency.linearRampToValueAtTime(up ? 1600 : 850, t + 0.15);
+    const g = a.createGain(); g.gain.value = ok ? 0.16 : 0.08;
+    src.connect(f).connect(g).connect(a.destination); src.start(t);
+  }
+  function tone(freq, t, dur, type = 'sine', vol = 0.1) {
+    const a = audio(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.value = freq;
+    const t0 = a.currentTime + t;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  let lastDing = 0;
+  function ding() {
+    const now = performance.now(); if (now - lastDing < 70) return; lastDing = now;
+    const p = rnd(0.97, 1.03);
+    tone(1568 * p, 0, 0.18, 'sine', 0.09); tone(2349 * p, 0.03, 0.25, 'sine', 0.05);
+  }
+  const chime = () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, i * 0.06, 0.3, 'triangle', 0.07));
+  const fizz = () => tone(220, 0, 0.12, 'square', 0.025);
+  function gong() { tone(98, 0, 2.6, 'sine', 0.2); tone(196.5, 0, 2.0, 'sine', 0.08); tone(277, 0.01, 1.6, 'sine', 0.05); tone(415, 0.02, 1.1, 'sine', 0.03); }
+
+  // ---------- music: three tracks in a loop ----------
+  // Browsers play sound only after a touch, so it starts with the first one; the sound button mutes it too.
+  const TRACKS = ['audio/jade rod.m4a', 'audio/jade rod2.m4a', 'audio/jade rod5.m4a'];
+  const music = new Audio();
+  music.preload = 'none';
+  music.volume = 0.35;
+  let trackNo = 0, musicStarted = false;
+  const setTrack = i => { trackNo = i % TRACKS.length; music.src = encodeURI(TRACKS[trackNo]); };
+  music.addEventListener('ended', () => { setTrack(trackNo + 1); playMusic(); });
+  music.addEventListener('error', () => { if (musicStarted) { setTrack(trackNo + 1); } });
+  function playMusic() {
+    if (!S.sound || document.hidden || !musicStarted) return;
+    if (!music.src) setTrack(trackNo);
+    const p = music.play(); if (p && p.catch) p.catch(() => {});
+  }
+  function startMusic() { if (musicStarted) return; musicStarted = true; playMusic(); }
+  document.addEventListener('pointerdown', startMusic, { passive: true });
+  document.addEventListener('keydown', startMusic);
+
+  // ---------- colors ----------
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let C = {};
+  function readColors() {
+    C = {
+      jl: css('--jade-l'), gold: css('--gold'), gl: css('--gold-l'), gd: css('--gold-d'), warn: css('--warn'),
+      red: css('--poster-red'), redD: css('--poster-red-d'), ray: css('--poster-ray'), mount: css('--poster-mount'),
+      cream: css('--cream'), creamD: css('--cream-d'), sil: css('--sil'), sil2: css('--sil-2'), sil3: css('--sil-3'), flag: css('--flag')
+    };
+  }
+
+  // ---------- background: propaganda poster ----------
+  const bg = $('#bg'), bctx = bg.getContext('2d');
+  function seeded(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+  function starPath(ctx, x, y, R, r, rot = -Math.PI / 2) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const a = rot + i * Math.PI / 5, rr = i % 2 ? r : R;
+      ctx[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+    }
+    ctx.closePath();
+  }
+  function shadedStar(ctx, x, y, R) {
+    const r = R * 0.382;
+    ctx.fillStyle = C.gold; starPath(ctx, x, y, R, r); ctx.fill();
+    // poster-style two-tone facets
+    ctx.fillStyle = C.gd; ctx.globalAlpha = 0.55;
+    for (let i = 0; i < 5; i++) {
+      const a = -Math.PI / 2 + i * 2 * Math.PI / 5, b = a + Math.PI / 5;
+      ctx.beginPath(); ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(a) * R, y + Math.sin(a) * R);
+      ctx.lineTo(x + Math.cos(b) * r, y + Math.sin(b) * r);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function cloud(ctx, x, y, s, r) {
+    const puffs = [[0, 0, 1], [0.9, -0.25, 0.8], [1.7, 0.05, 0.9], [-0.85, 0.1, 0.75], [2.4, 0.2, 0.6], [-1.5, 0.25, 0.55]];
+    ctx.fillStyle = C.cream; ctx.strokeStyle = C.creamD; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    puffs.forEach(([dx, dy, k]) => { const rr = s * k * (0.9 + r() * 0.2); ctx.moveTo(x + dx * s + rr, y + dy * s); ctx.arc(x + dx * s, y + dy * s, rr, 0, Math.PI * 2); });
+    ctx.fill();
+    // swirl lines
+    ctx.globalAlpha = 0.6;
+    puffs.slice(0, 4).forEach(([dx, dy, k]) => { ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s + s * 0.1, s * k * 0.55, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); });
+    ctx.globalAlpha = 1;
+    ctx.fillRect(x - 1.5 * s, y + s * 0.2, 4 * s, s * 0.6);
+  }
+  function roof(ctx, x, y, w, h) {
+    ctx.beginPath();
+    ctx.moveTo(x - w / 2, y - h * 0.42);
+    ctx.quadraticCurveTo(x - w * 0.43, y + h * 0.05, x - w * 0.36, y);
+    ctx.lineTo(x + w * 0.36, y);
+    ctx.quadraticCurveTo(x + w * 0.43, y + h * 0.05, x + w / 2, y - h * 0.42);
+    ctx.quadraticCurveTo(x + w * 0.4, y - h * 0.5, x + w * 0.3, y - h);
+    ctx.lineTo(x - w * 0.3, y - h);
+    ctx.quadraticCurveTo(x - w * 0.4, y - h * 0.5, x - w / 2, y - h * 0.42);
+    ctx.closePath(); ctx.fill();
+  }
+  function palace(ctx, x, base, w) {
+    const h = w * 0.44;
+    ctx.fillStyle = C.sil;
+    // terrace with gates
+    const th = h * 0.36;
+    ctx.fillRect(x - w / 2, base - th, w, th);
+    ctx.fillStyle = C.sil3;
+    for (let i = -2; i <= 2; i++) {
+      const gw = w * (i === 0 ? 0.075 : 0.055), gx = x + i * w * 0.15, gh = th * (i === 0 ? 0.62 : 0.5);
+      ctx.beginPath(); ctx.moveTo(gx - gw / 2, base); ctx.lineTo(gx - gw / 2, base - gh + gw / 2);
+      ctx.arc(gx, base - gh + gw / 2, gw / 2, Math.PI, 0); ctx.lineTo(gx + gw / 2, base); ctx.fill();
+    }
+    // battlement line
+    ctx.fillStyle = C.cream; ctx.globalAlpha = 0.5;
+    ctx.fillRect(x - w / 2, base - th, w, 2);
+    ctx.globalAlpha = 1;
+    // lower hall + roof
+    ctx.fillStyle = C.sil;
+    let y = base - th;
+    const h1 = h * 0.17;
+    ctx.fillRect(x - w * 0.36, y - h1, w * 0.72, h1);
+    ctx.fillStyle = C.sil3;
+    for (let i = 0; i < 9; i++) ctx.fillRect(x - w * 0.33 + i * w * 0.0825, y - h1 * 0.85, w * 0.012, h1 * 0.85);
+    ctx.fillStyle = C.sil;
+    y -= h1;
+    roof(ctx, x, y, w * 0.9, h * 0.17);
+    y -= h * 0.17;
+    const h2 = h * 0.1;
+    ctx.fillRect(x - w * 0.28, y - h2, w * 0.56, h2);
+    y -= h2;
+    roof(ctx, x, y, w * 0.74, h * 0.17);
+    // portrait-free plaque & lanterns
+    ctx.fillStyle = C.gold;
+    ctx.fillRect(x - w * 0.04, base - th - h1 * 0.75, w * 0.08, h1 * 0.4);
+    // stairs
+    ctx.fillStyle = C.sil2;
+    ctx.beginPath(); ctx.moveTo(x - w * 0.06, base); ctx.lineTo(x + w * 0.06, base); ctx.lineTo(x + w * 0.16, base + h * 0.22); ctx.lineTo(x - w * 0.16, base + h * 0.22); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = C.creamD; ctx.globalAlpha = 0.35; ctx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) { const t = i / 6; ctx.beginPath(); ctx.moveTo(x - w * (0.06 + 0.1 * t), base + h * 0.22 * t); ctx.lineTo(x + w * (0.06 + 0.1 * t), base + h * 0.22 * t); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    // flags
+    for (let i = 0; i < 5; i++) {
+      for (const side of [-1, 1]) {
+        const fx = x + side * (w * 0.56 + i * w * 0.07), fy = base + h * 0.05;
+        ctx.fillStyle = C.sil; ctx.fillRect(fx - 1, fy - h * 0.42, 2, h * 0.42);
+        ctx.fillStyle = C.flag;
+        ctx.beginPath(); ctx.moveTo(fx + 1, fy - h * 0.42); ctx.quadraticCurveTo(fx + side * 6 + 10, fy - h * 0.4, fx + 18, fy - h * 0.36); ctx.lineTo(fx + 1, fy - h * 0.3); ctx.closePath(); ctx.fill();
+      }
+    }
+  }
+  function factories(ctx, x0, x1, base, s, r, side) {
+    let x = x0;
+    while (x < x1) {
+      const bw = (40 + r() * 50) * s, bh = (30 + r() * 45) * s;
+      ctx.fillStyle = r() < 0.5 ? C.sil : C.sil2;
+      ctx.fillRect(x, base - bh, bw, bh);
+      // sawtooth roof
+      const teeth = Math.max(2, Math.round(bw / (14 * s)));
+      ctx.beginPath(); ctx.moveTo(x, base - bh);
+      for (let i = 0; i < teeth; i++) { const tx = x + bw * i / teeth; ctx.lineTo(tx + bw / teeth * 0.7, base - bh - 10 * s); ctx.lineTo(tx + bw / teeth, base - bh); }
+      ctx.closePath(); ctx.fill();
+      // windows
+      ctx.fillStyle = C.gold; ctx.globalAlpha = 0.35;
+      for (let wy = base - bh + 8 * s; wy < base - 6 * s; wy += 10 * s)
+        for (let wx = x + 5 * s; wx < x + bw - 6 * s; wx += 9 * s) if (r() < 0.55) ctx.fillRect(wx, wy, 4 * s, 4 * s);
+      ctx.globalAlpha = 1;
+      // chimneys with smoke
+      if (r() < 0.75) {
+        const cx = x + bw * (0.2 + r() * 0.6), ch = (70 + r() * 70) * s, cw = (7 + r() * 4) * s;
+        ctx.fillStyle = C.sil;
+        ctx.beginPath(); ctx.moveTo(cx - cw / 2, base - bh); ctx.lineTo(cx - cw * 0.35, base - bh - ch); ctx.lineTo(cx + cw * 0.35, base - bh - ch); ctx.lineTo(cx + cw / 2, base - bh); ctx.fill();
+        ctx.fillStyle = C.cream; ctx.globalAlpha = 0.5; ctx.fillRect(cx - cw * 0.4, base - bh - ch * 0.8, cw * 0.8, 2 * s); ctx.globalAlpha = 1;
+        let sx = cx, sy = base - bh - ch - 6 * s, sr = 7 * s;
+        for (let k = 0; k < 7; k++) {
+          ctx.fillStyle = C.cream; ctx.globalAlpha = 0.92 - k * 0.09;
+          ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = C.creamD; ctx.lineWidth = 1; ctx.stroke();
+          sx += side * (6 + r() * 6) * s; sy -= (7 + r() * 5) * s; sr *= 1.18;
+        }
+        ctx.globalAlpha = 1;
+      }
+      x += bw + r() * 6 * s;
+    }
+  }
+  function wheat(ctx, x, y, ang, len, s) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+    ctx.strokeStyle = C.gd; ctx.lineWidth = 2 * s;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(len * 0.1, -len * 0.5, 0, -len); ctx.stroke();
+    const n = 9;
+    for (let i = 0; i < n; i++) {
+      const t = 0.45 + i / n * 0.55, gy = -len * t, gx = len * 0.1 * (1 - t) * 1.5, gs = (7 - i * 0.35) * s;
+      for (const sd of [-1, 1]) {
+        ctx.save(); ctx.translate(gx + sd * gs * 0.55, gy); ctx.rotate(sd * 0.45);
+        ctx.fillStyle = C.gold; ctx.strokeStyle = C.gd; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(0, 0, gs * 0.45, gs, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -gs); ctx.lineTo(sd * gs * 0.4, -gs * 2.6); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    ctx.fillStyle = C.gl;
+    ctx.beginPath(); ctx.ellipse(0, -len - 4 * s, 3 * s, 6 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  function ribbon(ctx, W, H, side, s) {
+    ctx.save();
+    if (side > 0) { ctx.translate(W, 0); ctx.scale(-1, 1); }
+    const bands = [[C.redD, 0], [C.red, 18 * s], [C.redD, 36 * s]];
+    bands.forEach(([col, off], i) => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.moveTo(-10, H * 0.66 + off);
+      ctx.bezierCurveTo(W * 0.14, H * 0.7 + off, W * 0.22, H * 0.86 + off, W * 0.42, H + 10);
+      ctx.lineTo(-10, H + 10); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = C.gold; ctx.lineWidth = 2.2 * s; ctx.globalAlpha = 0.9;
+      ctx.beginPath(); ctx.moveTo(-10, H * 0.66 + off); ctx.bezierCurveTo(W * 0.14, H * 0.7 + off, W * 0.22, H * 0.86 + off, W * 0.42, H + 10); ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+    ctx.restore();
+  }
+  let grainPat = null;
+  function grain(ctx) {
+    if (!grainPat) {
+      const g = document.createElement('canvas'); g.width = g.height = 180;
+      const gc = g.getContext('2d'), id = gc.createImageData(180, 180);
+      for (let i = 0; i < id.data.length; i += 4) {
+        const v = Math.random();
+        const light = v > 0.5;
+        id.data[i] = light ? 255 : 40; id.data[i + 1] = light ? 236 : 10; id.data[i + 2] = light ? 200 : 6;
+        id.data[i + 3] = Math.random() < 0.5 ? Math.floor(Math.random() * 46) : 0;
+      }
+      gc.putImageData(id, 0, 0);
+      grainPat = ctx.createPattern(g, 'repeat');
+    }
+    return grainPat;
+  }
+  function drawBg() {
+    const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    const W = innerWidth, H = innerHeight;
+    bg.width = W * dpr; bg.height = H * dpr;
+    const ctx = bctx; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const r = seeded(1949);
+    const narrow = W < 700;
+    const s = clamp(Math.min(W, H) / 800, 0.6, 1.25);
+
+    // sun sits behind the rod
+    const st = document.getElementById('stage').getBoundingClientRect();
+    const cx = st.width ? st.left + st.width / 2 : W / 2;
+    const cy = clamp(st.height ? st.top + st.height * (narrow ? 0.4 : 0.3) : H * 0.4, H * 0.24, H * 0.52);
+    const sunR = clamp(Math.min(W, H) * 0.21, 95, 240);
+
+    const base = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.hypot(W, H));
+    base.addColorStop(0, C.red); base.addColorStop(0.6, C.red); base.addColorStop(1, C.redD);
+    ctx.fillStyle = base; ctx.fillRect(0, 0, W, H);
+
+    // sunburst
+    const rays = 44, far = Math.hypot(W, H) * 1.2;
+    ctx.fillStyle = C.ray;
+    for (let i = 0; i < rays; i += 2) {
+      const a0 = i * 2 * Math.PI / rays, a1 = a0 + 2 * Math.PI / rays * 0.85;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, far, a0, a1); ctx.closePath(); ctx.fill();
+    }
+    // thin cream rays
+    ctx.strokeStyle = C.cream; ctx.globalAlpha = 0.18; ctx.lineWidth = 1.2;
+    for (let i = 0; i < rays; i++) {
+      const a = (i + 0.5) * 2 * Math.PI / rays;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * sunR * 1.15, cy + Math.sin(a) * sunR * 1.15); ctx.lineTo(cx + Math.cos(a) * far, cy + Math.sin(a) * far); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // sun
+    const halo = ctx.createRadialGradient(cx, cy, sunR * 0.9, cx, cy, sunR * 1.6);
+    halo.addColorStop(0, 'rgba(246,226,180,.45)'); halo.addColorStop(1, 'rgba(246,226,180,0)');
+    ctx.fillStyle = halo; ctx.fillRect(cx - sunR * 2, cy - sunR * 2, sunR * 4, sunR * 4);
+    const disc = ctx.createRadialGradient(cx - sunR * 0.2, cy - sunR * 0.2, sunR * 0.1, cx, cy, sunR);
+    disc.addColorStop(0, C.cream); disc.addColorStop(1, C.creamD);
+    ctx.fillStyle = disc; ctx.beginPath(); ctx.arc(cx, cy, sunR, 0, Math.PI * 2); ctx.fill();
+    shadedStar(ctx, cx, cy - sunR * 0.04, sunR * 0.66);
+
+    // horizon
+    const hy = narrow ? H * 0.7 : H * 0.66;
+
+    // mountains
+    ctx.fillStyle = C.mount;
+    const peaks = narrow ? 5 : 8;
+    for (let i = 0; i < peaks; i++) {
+      const px = (i + r() * 0.6) / peaks * W, ph = (50 + r() * 80) * s, pw = (110 + r() * 90) * s;
+      ctx.beginPath(); ctx.moveTo(px - pw / 2, hy); ctx.lineTo(px - pw * 0.08, hy - ph); ctx.lineTo(px + pw * 0.05, hy - ph * 0.92); ctx.lineTo(px + pw / 2, hy); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = C.cream; ctx.globalAlpha = 0.45; ctx.lineWidth = 1;
+      for (let k = 0; k < 6; k++) { const t = k / 6; ctx.beginPath(); ctx.moveTo(px - pw * 0.08 + t * pw * 0.05, hy - ph + t * ph * 0.15); ctx.lineTo(px - pw * 0.08 - pw * 0.15 + t * pw * 0.1, hy - ph * 0.5 + t * ph * 0.3); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+    }
+
+    // sky clouds
+    cloud(ctx, W * (narrow ? 0.08 : 0.12), H * 0.28, 22 * s, r);
+    cloud(ctx, W * (narrow ? 0.86 : 0.86), H * 0.22, 26 * s, r);
+
+    // factories on both sides
+    const pw = clamp(W * 0.46, 250, 600);
+    factories(ctx, -20, cx - pw * 0.45, hy, s, r, -1);
+    factories(ctx, cx + pw * 0.45, W + 40, hy, s, r, 1);
+
+    // palace under the sun
+    palace(ctx, cx, hy, pw);
+
+    // cloud bank at the foot
+    for (let i = -1; i <= (narrow ? 4 : 7); i++) cloud(ctx, i * W / (narrow ? 4 : 7) + r() * 20, hy + 14 * s, (18 + r() * 10) * s, r);
+
+    // tree line
+    ctx.fillStyle = C.sil3;
+    ctx.fillRect(0, hy + 30 * s, W, H);
+    for (let x = -20; x < W + 30; x += 16 * s) {
+      const tr = (12 + r() * 14) * s;
+      ctx.fillStyle = r() < 0.5 ? C.sil3 : C.sil;
+      ctx.beginPath(); ctx.arc(x, hy + 30 * s + r() * 8 * s, tr, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = C.ray; ctx.globalAlpha = 0.5;
+    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.arc(r() * W, hy + 30 * s + r() * 30 * s, 3 * s, 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+
+    // ribbons and wheat in the corners
+    ribbon(ctx, W, H, -1, s);
+    ribbon(ctx, W, H, 1, s);
+    const ws = s * (narrow ? 0.8 : 1.05), wl = 150 * ws;
+    for (let i = 0; i < 5; i++) {
+      wheat(ctx, W * 0.03 + i * 9 * ws, H + 10, -0.55 + i * 0.16, wl * (0.9 + (i % 2) * 0.15), ws);
+      wheat(ctx, W * 0.97 - i * 9 * ws, H + 10, 0.55 - i * 0.16, wl * (0.9 + (i % 2) * 0.15), ws);
+    }
+
+    // slogan
+    ctx.save();
+    ctx.fillStyle = C.cream; ctx.globalAlpha = 0.5;
+    const fs = clamp(W / 24, 22, 44);
+    ctx.font = `${fs}px ${css('--f-han')}`; ctx.textAlign = 'center';
+    ['勤', '劳', '致', '富'].forEach((c, i) => ctx.fillText(c, narrow ? 22 : W * 0.045, H * 0.32 + i * fs * 1.15));
+    ctx.restore();
+
+    // paper grain and vignette
+    ctx.fillStyle = grain(ctx); ctx.fillRect(0, 0, W, H);
+    const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.hypot(W, H) * 0.62);
+    vg.addColorStop(0, 'rgba(12,9,7,0)'); vg.addColorStop(1, 'rgba(12,9,7,.55)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  }
+
+  // ---------- falling gold stars ----------
+  const pc = $('#petals'), pctx = pc.getContext('2d');
+  const petals = [];
+  function initPetals() {
+    const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    pc.width = innerWidth * dpr; pc.height = innerHeight * dpr;
+    pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    petals.length = 0;
+    if (RM) return;
+    const n = innerWidth < 600 ? 10 : 18;
+    for (let i = 0; i < n; i++) petals.push(newPetal(true));
+  }
+  function newPetal(any) {
+    return { x: rnd(0, innerWidth), y: any ? rnd(-50, innerHeight) : -20, vx: rnd(-0.2, 0.2), vy: rnd(0.3, 0.75), s: rnd(3, 6.5), a: rnd(0, 6), va: rnd(-0.02, 0.02), ph: rnd(0, 6) };
+  }
+  function drawPetals(dt) {
+    pctx.clearRect(0, 0, innerWidth, innerHeight);
+    const k = dt * 60;
+    petals.forEach((p, i) => {
+      p.ph += 0.02 * k; p.x += (p.vx + Math.sin(p.ph) * 0.3) * k; p.y += p.vy * k; p.a += p.va * k;
+      if (p.y > innerHeight + 20) petals[i] = newPetal(false);
+      pctx.globalAlpha = 0.55 + 0.3 * Math.sin(p.ph * 1.7);
+      pctx.fillStyle = C.gold;
+      starPath(pctx, p.x, p.y, p.s, p.s * 0.4, p.a);
+      pctx.fill();
+    });
+    pctx.globalAlpha = 1;
+  }
+
+  // ---------- fx canvas ----------
+  const cv = $('#fx'), ctx = cv.getContext('2d');
+  let W = 0, H = 0;
+  const parts = [], coinsFly = [];
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawBg(); initPetals(); measure();
+  }
+  function sparkle(x, y, n, color) {
+    if (RM) n = Math.ceil(n / 3);
+    for (let i = 0; i < n; i++) parts.push({ x, y, vx: rnd(-3.2, 3.2), vy: rnd(-3.5, 1.5), life: 1, decay: rnd(0.025, 0.05), s: rnd(1.5, 3.5), c: color || (Math.random() < 0.7 ? C.jl : C.gl) });
+  }
+  function flyCoin(x, y) {
+    const t = $('#coinIcon').getBoundingClientRect();
+    if (coinsFly.length > 24 || RM) { coinArrive(); return; }
+    coinsFly.push({ x0: x, y0: y, x1: t.left + t.width / 2, y1: t.top + t.height / 2, t: 0, d: rnd(0.55, 0.8), arc: rnd(-120, -60), side: rnd(-80, 80), rot: rnd(0, 6) });
+  }
+  function coinArrive() { const ic = $('#coinIcon'); ic.classList.remove('bump'); void ic.offsetWidth; ic.classList.add('bump'); ding(); }
+  function drawCoin(x, y, r, rot) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    const g = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+    g.addColorStop(0, C.gl); g.addColorStop(0.6, C.gold); g.addColorStop(1, C.gd);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+    const h = r * 0.32; ctx.rect(h, -h, -2 * h, 2 * h); ctx.fill('evenodd');
+    ctx.restore();
+  }
+
+  // ---------- rod geometry ----------
+  const stage = $('#stage'), rodEl = $('#rod'), wrap = $('#rodWrap');
+  let R = { top: 0, h: 1, left: 0, w: 0, wrapTop: 0 };
+  let clothT = 0.5, tilt = 0;
+  function measure() {
+    const r = rodEl.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    R = { top: r.top, h: r.height || 1, left: r.left, w: r.width, wrapTop: w.top };
+    setCloth(clothT);
+  }
+  function setCloth(t) {
+    clothT = t;
+    stage.style.setProperty('--clothY', ((R.top - R.wrapTop) + t * R.h).toFixed(1) + 'px');
+    stage.style.setProperty('--cy', (t * 100).toFixed(1) + '%');
+  }
+  const clothPoint = () => ({ x: R.left + R.w / 2, y: R.top + clothT * R.h });
+
+  // ---------- stroke detection ----------
+  let dragging = false, dir = 0, anchor = 0.5, ext = 0.5, counted = false, lastY = 0, lastTime = 0;
+  const passTimes = [];
+  let streak = 0;
+  const resetTrack = t => { dir = 0; anchor = t; ext = t; counted = false; };
+  function track(t) {
+    if (dir === 0) { if (Math.abs(t - anchor) <= 0.03) return; dir = Math.sign(t - anchor); ext = t; counted = false; }
+    if ((t - ext) * dir > 0) ext = t;
+    else if ((ext - t) * dir > HYST) { anchor = ext; dir = -dir; ext = t; counted = false; }
+    if (!counted && Math.abs(ext - anchor) >= MIN_PASS) { counted = true; pass(dir < 0); }
+  }
+  const currentSps = now => { while (passTimes.length && now - passTimes[0] > 2000) passTimes.shift(); return passTimes.length / 2; };
+  const tempoState = sps => sps > TEMPO_MAX ? 'fast' : sps >= tempoMin() ? 'ok' : 'cold';
+
+  function pass(up) {
+    const now = performance.now();
+    passTimes.push(now);
+    const st = tempoState(currentSps(now));
+    const ok = st === 'ok';
+    swish(up, ok);
+    const cloth = $('#cloth');
+    cloth.classList.remove('squish'); void cloth.offsetWidth; cloth.classList.add('squish');
+    const p = clothPoint();
+    sparkle(p.x - R.w / 2 - 14, p.y, ok ? 4 : 1);
+    sparkle(p.x + R.w / 2 + 14, p.y, ok ? 4 : 1);
+
+    const before = rankIdx();
+    S.strokes += 1; pend.strokes++;
+    if (ok) {
+      streak++;
+      if (streak > S.bestStreak) S.bestStreak = streak;
+      S.prog += 1;
+      drainAcc = 0;
+      if (S.prog >= STROKES_PER_COIN) {
+        S.prog = 0; pend.fills++;
+        S.frac += mult();
+        const whole = Math.floor(S.frac + 1e-9);
+        S.frac -= whole;
+        if (whole > 0) {
+          S.coins += whole; S.earned += whole; pend.coins += whole;
+          flyCoin(p.x, p.y);
+          floatText(p, '+' + whole);
+          sparkle(p.x, p.y, 10, C.gl);
+          if (S.earned % 25 === 0) nextQuote();
+        }
+      }
+    } else {
+      streak = 0;
+      if (st === 'fast') fizz();
+    }
+    const after = rankIdx();
+    if (after > before) rankUp(after);
+    hintIdle = 0; $('#hint').classList.add('off');
+    dirty = true;
+  }
+
+  function floatText(p, text) {
+    const sr = stage.getBoundingClientRect();
+    const el = document.createElement('span');
+    el.className = 'float'; el.textContent = text;
+    el.style.left = (p.x - sr.left + R.w + rnd(-20, 20)) + 'px';
+    el.style.top = (p.y - sr.top - 20) + 'px';
+    stage.append(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+  function rankUp(i) {
+    gong();
+    const b = $('#banner');
+    const newStage = i > 0 && RANKS[i][2] !== RANKS[i - 1][2];
+    b.innerHTML = `<small>${newStage ? 'Новая ступень · ' + STAGES[RANKS[i][2] - 1] : 'Ранг ' + (i + 1) + ' из ' + RANKS.length}</small>` + RANKS[i][1];
+    b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+    const p = clothPoint(); sparkle(p.x, p.y, 40, C.gl);
+    nextQuote();
+  }
+  function nextQuote() {
+    const q = $('#quote');
+    S.quote = (S.quote + 1 + Math.floor(Math.random() * (QUOTES.length - 1))) % QUOTES.length;
+    q.classList.add('fade');
+    setTimeout(() => { q.textContent = QUOTES[S.quote]; q.classList.remove('fade'); }, 400);
+  }
+
+  // pointer
+  const tFromY = y => clamp((y - R.top) / R.h, 0.06, 0.94);
+  stage.addEventListener('pointerdown', e => {
+    if (e.button > 0) return;
+    measure(); dragging = true;
+    try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    const t = tFromY(e.clientY); setCloth(t); resetTrack(t);
+    lastY = e.clientY; lastTime = performance.now();
+    audio(); e.preventDefault();
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+    for (const ev of (evs.length ? evs : [e])) { const t = tFromY(ev.clientY); setCloth(t); track(t); }
+    const now = performance.now(), dt = Math.max(8, now - lastTime);
+    tilt = clamp((e.clientY - lastY) / dt * 9, -12, 12);
+    lastY = e.clientY; lastTime = now;
+  });
+  const end = () => { dragging = false; };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', end);
+  stage.addEventListener('lostpointercapture', end);
+
+  let lastKey = '';
+  stage.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    if (e.repeat || e.key === lastKey) return;
+    lastKey = e.key; audio(); measure();
+    const up = e.key === 'ArrowUp';
+    setCloth(up ? 0.12 : 0.88); tilt = up ? -8 : 8;
+    pass(up);
+  });
+
+  // ---------- render ----------
+  let dirty = true, heat = 0, hintIdle = 0, saveAcc = 0, netAcc = 0, drainAcc = 0, tempo = '';
+  const beads = $('#beads');
+  beads.innerHTML = Array.from({ length: STROKES_PER_COIN }, () => '<span class="bead"></span>').join('');
+  const beadEls = [...beads.children];
+
+  function itemHTML(it) {
+    return `<button class="item" id="buy-${it.id}" type="button" data-id="${it.id}">
+      <span class="ic">${it.icon}</span>
+      <span class="nm">${it.name}<em></em></span>
+      <span class="ds">${it.desc}</span>
+      <span class="cost"><svg aria-hidden="true"><use href="#coin"/></svg><span></span></span>
+    </button>`;
+  }
+  function renderShop() {
+    $('#shop').innerHTML = ITEMS.map(itemHTML).join('');
+    $('#shopCos').innerHTML = COSMETICS.map(itemHTML).join('');
+  }
+  function applyCosmetics() { COSMETICS.forEach(c => stage.classList.toggle(c.cls, S.lv[c.id] > 0)); }
+
+  function render() {
+    $('#coins').textContent = fmt(S.coins);
+    $('#strokes').textContent = fmt(S.strokes);
+    const ri = rankIdx(), next = RANKS[ri + 1];
+    $('#rankName').textContent = RANKS[ri][1];
+    $('#stRank').textContent = `${ri + 1} из ${RANKS.length}`;
+    $('#stStage').textContent = `${RANKS[ri][2]}. ${STAGES[RANKS[ri][2] - 1]}`;
+    $('#stNext').textContent = next ? fmt(next[0] - S.strokes) + ' мазков' : 'вершина пути';
+    $('#rankFill').style.width = next ? ((S.strokes - RANKS[ri][0]) / (next[0] - RANKS[ri][0]) * 100) + '%' : '100%';
+    $('#stStrokes').textContent = fmt(S.strokes);
+    $('#stEarned').textContent = fmt(S.earned);
+    $('#stSpent').textContent = fmt(S.spent);
+    $('#stStreak').textContent = fmt(S.bestStreak) + ' мазков';
+    $('#progTxt').textContent = `${S.prog} / ${STROKES_PER_COIN}`;
+    beadEls.forEach((b, i) => { b.classList.toggle('on', i < S.prog); b.classList.toggle('edge', i === S.prog - 1); });
+    const m = mult();
+    $('#perCoin').textContent = `10 мазков = ${m === 1 ? '1' : dec(m, 2).replace(/0$/, '')}`;
+    const lo = tempoMin();
+    $('#zone').style.left = (lo / TEMPO_SCALE * 100) + '%';
+    $('#zone').style.width = ((TEMPO_MAX - lo) / TEMPO_SCALE * 100) + '%';
+    $('#qnote').textContent = `Монеты капают при ${dec(lo)}–${TEMPO_MAX} мазка/с. Медленнее — бусины сгорают, быстрее — не засчитывается.`;
+    $('#shopDot').hidden = !ALL.some(it => !maxed(it) && S.coins >= cost(it));
+    ALL.forEach(it => {
+      const el = $('#buy-' + it.id);
+      const mx = maxed(it), c = cost(it), can = !mx && S.coins >= c;
+      el.disabled = !can;
+      el.classList.toggle('can', can);
+      el.classList.toggle('maxed', mx);
+      el.querySelector('em').textContent = it.max > 1 && S.lv[it.id] ? `${S.lv[it.id]}/${it.max}` : '';
+      el.querySelector('.cost span').textContent = mx ? (it.max > 1 ? 'макс.' : 'куплено') : fmt(c);
+      el.setAttribute('aria-label', `${it.name}. ${it.desc}. ${mx ? 'Куплено' : 'Цена ' + c}`);
+    });
+    applyCosmetics();
+    dirty = false;
+  }
+
+  const TAGS = { ok: 'В ритме · монеты капают', cold: 'Быстрее! Бусины сгорают', fast: 'Слишком быстро · не засчитывается' };
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+
+    const sps = currentSps(now);
+    const st = (sps === 0 && S.prog === 0) ? '' : tempoState(sps);
+    if (st !== tempo) {
+      tempo = st;
+      if (st) { stage.dataset.tempo = st; $('#tempoTag').textContent = TAGS[st]; }
+      else delete stage.dataset.tempo;
+      $('#qi').classList.toggle('fast', st === 'fast');
+    }
+
+    // beads burn while out of tempo
+    const draining = st !== 'ok' && S.prog > 0;
+    beads.classList.toggle('draining', draining);
+    if (draining) {
+      drainAcc += dt;
+      if (drainAcc >= drainSec()) { drainAcc = 0; S.prog--; dirty = true; }
+    }
+    if (st !== 'ok' && sps < tempoMin() && streak && now - (passTimes[passTimes.length - 1] || 0) > 600) streak = 0;
+
+    const target = clamp(sps / 4, 0, 1);
+    heat += (target - heat) * Math.min(1, dt * (target > heat ? 6 : 2));
+    stage.style.setProperty('--heat', heat.toFixed(3));
+    $('#qiFill').style.width = clamp(sps / TEMPO_SCALE * 100, 0, 100).toFixed(1) + '%';
+    $('#spsTxt').textContent = dec(sps) + ' мазка/с';
+
+    tilt *= Math.pow(0.0015, dt);
+    stage.style.setProperty('--tilt', tilt.toFixed(2) + 'deg');
+
+    hintIdle += dt;
+    if (hintIdle > 6 && !dragging) $('#hint').classList.remove('off');
+
+    saveAcc += dt;
+    if (saveAcc > 2) { saveAcc = 0; save(); }
+    // To the server every SYNC_COINS coins; strokes without coins at least every SYNC_IDLE_SEC, so the session stays open
+    netAcc += dt;
+    if (net && !net.dead && !net.busy && now >= net.retryAt && (pend.coins >= Rules.SYNC_COINS || (pend.strokes && netAcc >= Rules.SYNC_IDLE_SEC))) flush();
+    if (dirty) render();
+
+    if (petals.length) drawPetals(dt);
+
+    ctx.clearRect(0, 0, W, H);
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.vy += 0.12; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      ctx.globalAlpha = p.life; ctx.fillStyle = p.c;
+      const s = p.s * (0.6 + p.life * 0.6);
+      ctx.beginPath(); ctx.moveTo(p.x, p.y - s * 1.8); ctx.lineTo(p.x + s * 0.5, p.y); ctx.lineTo(p.x, p.y + s * 1.8); ctx.lineTo(p.x - s * 0.5, p.y); ctx.closePath(); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    for (let i = coinsFly.length - 1; i >= 0; i--) {
+      const c = coinsFly[i];
+      c.t += dt / c.d;
+      if (c.t >= 1) { coinsFly.splice(i, 1); coinArrive(); continue; }
+      const k = c.t, e = k * k * (3 - 2 * k);
+      drawCoin(c.x0 + (c.x1 - c.x0) * e + c.side * Math.sin(Math.PI * k), c.y0 + (c.y1 - c.y0) * e + c.arc * Math.sin(Math.PI * k), 11 - 3 * k, c.rot + k * 8);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- shop ----------
+  function onBuy(e) {
+    const b = e.target.closest('.item'); if (!b || b.disabled) return;
+    const it = ALL.find(x => x.id === b.dataset.id);
+    const c = cost(it);
+    if (maxed(it) || S.coins < c) return;
+    if (net) {
+      if (net.dead) return toast(LOST);
+      b.disabled = true;
+      flush();
+      queue(async () => {
+        const r = await call('buy', { item: it.id });
+        if (r.closed) return lost();
+        if (typeof r.balance === 'number') fromServer(r);
+        if (r.error) toast(r.error); else bought(b);
+        dirty = true;
+      });
+      return;
+    }
+    S.coins -= c; S.spent += c; S.lv[it.id]++;
+    bought(b);
+    dirty = true; save();
+  }
+  function bought(b) {
+    chime();
+    b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
+    const r = b.getBoundingClientRect();
+    sparkle(r.left + 30, r.top + r.height / 2, 14, C.gl);
+  }
+  $('#shop').addEventListener('click', onBuy);
+  $('#shopCos').addEventListener('click', onBuy);
+
+  function toast(msg, ms = 2200) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), ms); }
+
+  // ---------- online: inside the messenger the coins are the real balance ----------
+  // The page counts strokes and full bead rows and sends them; the server checks them against the time,
+  // pays the coins and answers with the balance. The server address comes from the page link (?api=host).
+  let tg = null, net = null, keepLocal = true;   // keepLocal: progress is this browser's, not the server's
+  const pend = { strokes: 0, fills: 0, coins: 0 };   // counted here, not sent yet (coins: what the page expects)
+  const LOST = 'Игра открыта в другом окне — здесь монеты больше не капают';
+
+  async function loadTelegram() {
+    if (!/tgWebAppData/.test(location.hash)) return null;
+    await new Promise(done => {
+      const s = document.createElement('script');
+      s.src = 'https://telegram.org/js/telegram-web-app.js';
+      s.onload = s.onerror = done;
+      document.head.append(s);
+    });
+    return window.Telegram?.WebApp || null;
+  }
+  const apiUrl = route => `https://${net.host}/jaderod/api/${route}`;
+  async function call(route, body = {}) {
+    try {
+      const res = await fetch(apiUrl(route), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ game: net.token, sid: net.sid, ...body }),
+        referrerPolicy: 'no-referrer',
+        keepalive: true,
+      });
+      return await res.json();
+    } catch (e) {
+      return { error: 'Нет связи с сервером игры', offline: true };
+    }
+  }
+  // One request at a time, in order
+  function queue(fn) {
+    net.busy = true;
+    net.q = (net.q || Promise.resolve()).then(fn).catch(() => {}).finally(() => { if (net.q === p) net.busy = false; });
+    const p = net.q;
+    return p;
+  }
+  // The server's numbers, plus what was rubbed here since the request went out
+  function fromServer(r) {
+    S.coins = r.balance + pend.coins;
+    S.earned = r.earned + pend.coins;
+    S.spent = r.spent;
+    S.strokes = r.strokes + pend.strokes;
+    S.bestStreak = Math.max(S.bestStreak, r.best);
+    if (!pend.fills) S.frac = r.frac;
+    S.lv = Rules.levels(r.lv);
+    dirty = true;
+  }
+  function flush() {
+    if (!net || net.dead) return Promise.resolve();
+    return queue(async () => {
+      if (!pend.strokes && !pend.fills) return;
+      const sent = { ...pend };
+      pend.strokes = pend.fills = pend.coins = 0; netAcc = 0;
+      const r = await call('sync', { strokes: sent.strokes, fills: sent.fills, best: S.bestStreak });
+      if (r.closed) return lost();
+      // Not taken: back into the queue, the next try in 10 s rather than on every frame
+      if (r.error) { pend.strokes += sent.strokes; pend.fills += sent.fills; pend.coins += sent.coins; net.retryAt = performance.now() + 10000; return; }
+      fromServer(r);
+    });
+  }
+  function lost() { net.dead = true; toast(LOST, 5000); }
+  // The page goes away: the last strokes and the end of the session in one request that outlives it
+  function closeNet() {
+    if (!net || net.dead) return;
+    net.dead = true;
+    const body = JSON.stringify({ game: net.token, sid: net.sid, strokes: pend.strokes, fills: pend.fills, best: S.bestStreak });
+    try { navigator.sendBeacon(apiUrl('close'), new Blob([body], { type: 'text/plain' })); } catch (e) {}
+  }
+
+  // ---------- mobile sheet ----------
+  const side = $('#side'), scrim = $('#scrim');
+  function openSheet(tab) {
+    side.dataset.tab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false'));
+    if (!side.classList.contains('open')) side.scrollTop = 0;
+    side.classList.add('open');
+    scrim.hidden = false;
+    requestAnimationFrame(() => scrim.classList.add('on'));
+  }
+  function closeSheet() {
+    side.classList.remove('open');
+    scrim.classList.remove('on');
+    setTimeout(() => { if (!side.classList.contains('open')) scrim.hidden = true; }, 300);
+  }
+  $('#openShop').addEventListener('click', () => openSheet('shop'));
+  $('#openPath').addEventListener('click', () => openSheet('path'));
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => openSheet(t.dataset.tab)));
+  $('#sheetClose').addEventListener('click', closeSheet);
+  scrim.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) closeSheet(); });
+
+  function setSnd() { $('#sndBtn').setAttribute('aria-pressed', S.sound ? 'true' : 'false'); }
+  $('#sndBtn').addEventListener('click', () => {
+    S.sound = !S.sound; setSnd(); save();
+    if (S.sound) { ding(); startMusic(); playMusic(); } else music.pause();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { save(); music.pause(); flush(); }
+    else playMusic();
+  });
+  addEventListener('pagehide', () => { save(); closeNet(); });
+  let rt = 0;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 120); });
+  addEventListener('scroll', measure, { passive: true });
+
+  function start(data) {
+    if (data && typeof data.coins === 'number') apply(data); else load();
+    loadSound();
+    readColors(); renderShop(); setSnd();
+    $('#quote').textContent = QUOTES[S.quote % QUOTES.length];
+    resize(); setCloth(0.5);
+    if (S.strokes > 0) $('#hint').classList.add('off');
+    render();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawBg(); measure(); });
+    requestAnimationFrame(t => { last = t; frame(t); });
+  }
+
+  async function boot() {
+    tg = await loadTelegram();
+    tg?.ready(); tg?.expand(); tg?.disableVerticalSwipes?.();
+    tg?.setHeaderColor?.('#1a1512'); tg?.setBackgroundColor?.('#1a1512');
+    const host = new URLSearchParams(location.search).get('api') || '';
+    const token = tg?.initDataUnsafe?.start_param || '';
+    if (tg?.initData && token && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(host)) {
+      net = { host, token, sid: '', busy: false, dead: false, retryAt: 0 };
+      keepLocal = false;
+      const r = await call('open', { initData: tg.initData });
+      if (r.sid) {
+        net.sid = r.sid;
+        start({ coins: r.balance, earned: r.earned, spent: r.spent, strokes: r.strokes, bestStreak: r.best, frac: r.frac, lv: r.lv, quote: Math.floor(Math.random() * QUOTES.length) });
+        return;
+      }
+      // No session: the game still runs, just without coins
+      net = null;
+      start({ ...fresh(), quote: Math.floor(Math.random() * QUOTES.length) });
+      toast(r.error || 'Нет связи с сервером игры', 5000);
+      return;
+    }
+    // No game link or no server address: the game runs here and keeps its progress in this browser
+    start(null);
+  }
+  boot();
+})();
+</script>
+
+</body>
+</html>
