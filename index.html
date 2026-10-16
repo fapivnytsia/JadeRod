@@ -453,7 +453,7 @@ button{font:inherit;color:inherit}
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
-import * as Rules from './rules.js?v=2';
+import * as Rules from './rules.js?v=3';
 
 (() => {
   const $ = s => document.querySelector(s);
@@ -1299,10 +1299,11 @@ import * as Rules from './rules.js?v=2';
 
     saveAcc += dt;
     if (saveAcc > 2) { saveAcc = 0; save(); }
-    // To the server every SYNC_COINS coins; strokes without coins at least every SYNC_IDLE_SEC, so the session stays open
+    // To the server every SYNC_COINS coins, and every SYNC_IDLE_SEC anyway while the game is on the screen:
+    // the server takes silence for a close, since the messenger closes a mini app without a word from the page
     netAcc += dt;
     if (net && net.closed && !net.dead && !net.busy && now >= net.retryAt) resume();
-    if (net && !net.closed && !net.dead && !net.busy && now >= net.retryAt && (pend.coins >= Rules.SYNC_COINS || (pend.strokes && netAcc >= Rules.SYNC_IDLE_SEC))) flush();
+    if (net && !net.closed && !net.dead && !net.busy && now >= net.retryAt && (pend.coins >= Rules.SYNC_COINS || netAcc >= Rules.SYNC_IDLE_SEC)) flush();
     if (dirty) render();
 
     if (petals.length) drawPetals(dt);
@@ -1415,7 +1416,6 @@ import * as Rules from './rules.js?v=2';
   function flush() {
     if (!net || net.dead || net.closed) return Promise.resolve();
     return queue(async () => {
-      if (!pend.strokes && !pend.fills) return;
       const sent = { ...pend };
       pend.strokes = pend.fills = pend.coins = 0; netAcc = 0;
       const r = await call('sync', { strokes: sent.strokes, fills: sent.fills, best: S.bestStreak });

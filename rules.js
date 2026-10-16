@@ -6,11 +6,12 @@ export const TEMPO_MIN = 1.5;       // strokes per second needed for coins to dr
 export const TEMPO_MAX = 7;         // faster than this looks like a macro and is not counted
 export const DRAIN_BASE = 0.7;      // seconds per bead lost while out of tempo
 
-// When the page sends: every SYNC_COINS new coins, when it closes, and, if strokes wait, at least every
-// SYNC_IDLE_SEC, so the server does not take a slow player for gone (it closes a session after IDLE_SEC without news)
+// When the page sends: every SYNC_COINS new coins and, while the game is on the screen, at least every
+// SYNC_IDLE_SEC even with nothing to send. The messenger closes a mini app without a word from the page,
+// so the server takes IDLE_SEC of silence for a close (a cron checks every minute) and tells the chat.
 export const SYNC_COINS = 10;
-export const SYNC_IDLE_SEC = 300;
-export const IDLE_SEC = 600;
+export const SYNC_IDLE_SEC = 30;
+export const IDLE_SEC = 90;
 
 // What the server accepts: from the start of a session strokes and full bead rows add up at these rates,
 // whatever comes is taken from that, so a macro gets no more than a hand in tempo could rub in the same time.
