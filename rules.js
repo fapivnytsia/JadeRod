@@ -1,34 +1,38 @@
 // The jade rod rules, shared by the server and the page: one file, copied as is next to the page.
 // No outside code here: plain numbers and functions, so it runs on the game server and in a browser alike.
 
-export const STROKES_PER_COIN = 10; // strokes in tempo for one coin (times the shop multiplier)
+export const STROKES_PER_COIN = 10; // strokes in tempo for one full bead row; a row pays perRow coins
 export const TEMPO_MIN = 1.5;       // strokes per second needed for coins to drip
 export const TEMPO_MAX = 7;         // faster than this looks like a macro and is not counted
 export const DRAIN_BASE = 0.7;      // seconds per bead lost while out of tempo
 
-// When the page sends: every SYNC_COINS new coins and, while the game is on the screen, at least every
-// SYNC_IDLE_SEC even with nothing to send. The messenger closes a mini app without a word from the page,
-// so the server takes IDLE_SEC of silence for a close (a cron checks every minute) and tells the chat.
-export const SYNC_COINS = 10;
-export const SYNC_IDLE_SEC = 30;
-export const IDLE_SEC = 90;
+// When the page sends: every SYNC_FILLS full rows, after SYNC_IDLE_SEC if only strokes without coins wait,
+// before a purchase and once when the game is hidden. Nothing while nobody rubs.
+// The server quietly closes a session after IDLE_SEC without a request (the hourly cron checks).
+export const SYNC_FILLS = 20;
+export const SYNC_IDLE_SEC = 300;
+export const IDLE_SEC = 3600;
 
 // What the server accepts: from the start of a session strokes and full bead rows add up at these rates,
 // whatever comes is taken from that, so a macro gets no more than a hand in tempo could rub in the same time.
 // What was not used is kept for up to ROOM_MAX_SEC worth.
 export const STROKES_PER_SEC = 10;                              // strokes of any tempo
-export const FILLS_PER_SEC = TEMPO_MAX / STROKES_PER_COIN;      // full bead rows, one row = one coin before the multiplier
+export const FILLS_PER_SEC = TEMPO_MAX / STROKES_PER_COIN;      // full bead rows
 export const ROOM_MAX_SEC = 3600;
 
 // The shop. lv is { silk, oil, emp, goldCloth, whiteJade }: how many of each are bought.
 // cost of the next one = base * k^level, max is the most one can buy.
 export const ITEMS = [
-  { id: "silk", base: 150, k: 2.2, max: 5 },        // +10% coins per level
-  { id: "oil", base: 120, k: 2.6, max: 3 },         // tempo floor -0.2, beads burn slower
-  { id: "emp", base: 1500, k: 3, max: 3 },          // +25% coins per seal
-  { id: "goldCloth", base: 400, k: 1, max: 1 },     // looks only
-  { id: "whiteJade", base: 1000, k: 1, max: 1 },    // looks only
+  { id: "silk", base: 75, k: 1.48, max: 10 },       // +0.4 coin per row per level, +4 in all
+  { id: "oil", base: 60, k: 1.61, max: 6 },         // tempo floor -0.1 per level, beads burn slower
+  { id: "emp", base: 750, k: 1.73, max: 6 },        // +1 coin per row per seal, +6 in all
+  { id: "goldCloth", base: 200, k: 1, max: 1 },     // looks only
+  { id: "whiteJade", base: 500, k: 1, max: 1 },     // looks only
 ];
+
+export const SILK_BONUS = 0.4;  // coins per row per silk level
+export const SEAL_BONUS = 1;    // coins per row per seal
+export const ROW_MAX = 20;      // a row never pays more: stage up to 10 + shop up to 10
 
 export const freshLevels = () => Object.fromEntries(ITEMS.map(it => [it.id, 0]));
 
@@ -42,9 +46,11 @@ export function levels(raw) {
   return lv;
 }
 
-export const mult = lv => (1 + 0.1 * lv.silk) * (1 + 0.25 * lv.emp);
-export const tempoMin = lv => TEMPO_MIN - 0.2 * lv.oil;
-export const drainSec = lv => DRAIN_BASE * (1 + 0.6 * lv.oil);
+// Coins for one full row: the rank's stage (1-10) plus the shop, ROW_MAX at most
+export const shopBonus = lv => SILK_BONUS * lv.silk + SEAL_BONUS * lv.emp;
+export const perRow = (lv, strokes) => Math.min(ROW_MAX, RANKS[rankIdx(strokes)][2] + shopBonus(lv));
+export const tempoMin = lv => TEMPO_MIN - 0.1 * lv.oil;
+export const drainSec = lv => DRAIN_BASE * (1 + 0.3 * lv.oil);
 export const cost = (it, lv) => Math.round(it.base * Math.pow(it.k, lv[it.id]));
 export const maxed = (it, lv) => lv[it.id] >= it.max;
 

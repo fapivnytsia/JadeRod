@@ -453,7 +453,7 @@ button{font:inherit;color:inherit}
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
-import * as Rules from './rules.js?v=3';
+import * as Rules from './rules.js?v=4';
 
 (() => {
   const $ = s => document.querySelector(s);
@@ -473,11 +473,11 @@ import * as Rules from './rules.js?v=3';
   const TEMPO_SCALE = 8;    // right edge of the tempo bar
 
   const ITEMS = [
-    { id: 'silk', name: 'Шёлковый платок', desc: '+10% к монетам за уровень',
+    { id: 'silk', name: 'Шёлковый платок', desc: '+0,4 монеты за ряд за уровень',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6c3-2 5 2 8 0s5-2 8 0v12c-3-2-5 2-8 0s-5-2-8 0z"/><path d="M8 9v7M16 9v7"/></svg>' },
-    { id: 'oil', name: 'Масло лотоса', desc: 'Нижняя граница темпа −0,2, бусины сгорают медленнее',
+    { id: 'oil', name: 'Масло лотоса', desc: 'Нижняя граница темпа −0,1, бусины сгорают медленнее',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg>' },
-    { id: 'emp', name: 'Печать императора', desc: '+25% к монетам за печать',
+    { id: 'emp', name: 'Печать императора', desc: '+1 монета за ряд за печать',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/><path d="M9 15.5h6"/></svg>' }
   ];
   const COSMETICS = [
@@ -631,7 +631,8 @@ import * as Rules from './rules.js?v=3';
   });
   let S = fresh();
 
-  const mult = () => Rules.mult(S.lv);
+  // Coins for a full row: the stage of the rank plus the shop, 20 at most (rules.js)
+  const mult = () => Rules.perRow(S.lv, S.strokes);
   const tempoMin = () => Rules.tempoMin(S.lv);
   const drainSec = () => Rules.drainSec(S.lv);
   const cost = it => Rules.cost(it, S.lv);
@@ -1242,7 +1243,7 @@ import * as Rules from './rules.js?v=3';
     $('#progTxt').textContent = `${S.prog} / ${STROKES_PER_COIN}`;
     beadEls.forEach((b, i) => { b.classList.toggle('on', i < S.prog); b.classList.toggle('edge', i === S.prog - 1); });
     const m = mult();
-    $('#perCoin').textContent = `10 мазков = ${m === 1 ? '1' : dec(m, 2).replace(/0$/, '')}`;
+    $('#perCoin').textContent = `10 мазков = ${Number.isInteger(m) ? m : dec(m, 1)}`;
     const lo = tempoMin();
     $('#zone').style.left = (lo / TEMPO_SCALE * 100) + '%';
     $('#zone').style.width = ((TEMPO_MAX - lo) / TEMPO_SCALE * 100) + '%';
@@ -1299,11 +1300,11 @@ import * as Rules from './rules.js?v=3';
 
     saveAcc += dt;
     if (saveAcc > 2) { saveAcc = 0; save(); }
-    // To the server every SYNC_COINS coins, and every SYNC_IDLE_SEC anyway while the game is on the screen:
-    // the server takes silence for a close, since the messenger closes a mini app without a word from the page
+    // To the server every SYNC_FILLS full rows, or after SYNC_IDLE_SEC if only strokes without coins wait.
+    // Nothing while nobody rubs: every request counts against the server's daily limit.
     netAcc += dt;
     if (net && net.closed && !net.dead && !net.busy && now >= net.retryAt) resume();
-    if (net && !net.closed && !net.dead && !net.busy && now >= net.retryAt && (pend.coins >= Rules.SYNC_COINS || netAcc >= Rules.SYNC_IDLE_SEC)) flush();
+    if (net && !net.closed && !net.dead && !net.busy && now >= net.retryAt && (pend.fills >= Rules.SYNC_FILLS || (pend.strokes && netAcc >= Rules.SYNC_IDLE_SEC))) flush();
     if (dirty) render();
 
     if (petals.length) drawPetals(dt);
@@ -1416,6 +1417,7 @@ import * as Rules from './rules.js?v=3';
   function flush() {
     if (!net || net.dead || net.closed) return Promise.resolve();
     return queue(async () => {
+      if (!pend.strokes && !pend.fills) return;
       const sent = { ...pend };
       pend.strokes = pend.fills = pend.coins = 0; netAcc = 0;
       const r = await call('sync', { strokes: sent.strokes, fills: sent.fills, best: S.bestStreak });
@@ -1427,16 +1429,16 @@ import * as Rules from './rules.js?v=3';
     });
   }
   function lost() { net.dead = true; toast(LOST, 5000); }
-  // The page is hidden or goes away: the last strokes and the end of the session in one request that outlives it.
-  // The messenger closes a mini app without pagehide, only hiding it, so hidden is the moment to tell the server.
-  function closeNet() {
-    if (!net || net.dead || net.closed) return;
-    net.closed = true;
+  // The page is hidden or goes away: what was rubbed goes in one request that outlives the page.
+  // The session stays open; it may never come back, then the hourly cron closes it quietly.
+  function flushBeacon() {
+    if (!net || net.dead || net.closed || (!pend.strokes && !pend.fills)) return;
     const body = JSON.stringify({ game: net.token, sid: net.sid, strokes: pend.strokes, fills: pend.fills, best: S.bestStreak });
-    pend.strokes = pend.fills = pend.coins = 0;
-    try { navigator.sendBeacon(apiUrl('close'), new Blob([body], { type: 'text/plain' })); } catch (e) {}
+    try { if (!navigator.sendBeacon(apiUrl('sync'), new Blob([body], { type: 'text/plain' }))) return; } catch (e) { return; }
+    pend.strokes = pend.fills = pend.coins = 0; netAcc = 0;
   }
-  // Shown again after closeNet: a new session with the old key, quietly. Too late or taken over: no more coins here.
+  // The server closed the session (an hour without requests) while the page stayed open: a new one with the
+  // old key, quietly. Taken over by another window: no more coins here.
   function resume() {
     queue(async () => {
       if (!net.closed || net.dead) return;
@@ -1476,10 +1478,10 @@ import * as Rules from './rules.js?v=3';
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { save(); music.pause(); closeNet(); }
+    if (document.hidden) { save(); music.pause(); flushBeacon(); }
     else { playMusic(); if (net && net.closed && !net.dead) resume(); }
   });
-  addEventListener('pagehide', () => { save(); closeNet(); });
+  addEventListener('pagehide', () => { save(); flushBeacon(); });
   let rt = 0;
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 120); });
   addEventListener('scroll', measure, { passive: true });
