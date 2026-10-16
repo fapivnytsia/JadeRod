@@ -690,23 +690,28 @@ import * as Rules from './rules.js?v=2';
   function gong() { tone(98, 0, 2.6, 'sine', 0.2); tone(196.5, 0, 2.0, 'sine', 0.08); tone(277, 0.01, 1.6, 'sine', 0.05); tone(415, 0.02, 1.1, 'sine', 0.03); }
 
   // ---------- music: three tracks in a loop ----------
-  // Browsers play sound only after a touch, so it starts with the first one; the sound button mutes it too.
+  // Browsers let sound start only from a tap, and on a phone that is lifting the finger (pointerup, touchend,
+  // click), not touching it. So every tap tries until the music really plays; the sound button mutes it too.
   const TRACKS = ['audio/jade rod.m4a', 'audio/jade rod2.m4a', 'audio/jade rod5.m4a'];
   const music = new Audio();
   music.preload = 'none';
   music.volume = 0.35;
-  let trackNo = 0, musicStarted = false;
+  let trackNo = 0, musicWanted = false;   // a tap has come: play whenever the sound is on and the page shown
   const setTrack = i => { trackNo = i % TRACKS.length; music.src = encodeURI(TRACKS[trackNo]); };
   music.addEventListener('ended', () => { setTrack(trackNo + 1); playMusic(); });
-  music.addEventListener('error', () => { if (musicStarted) { setTrack(trackNo + 1); } });
+  music.addEventListener('error', () => { if (musicWanted) setTrack(trackNo + 1); });
   function playMusic() {
-    if (!S.sound || document.hidden || !musicStarted) return;
+    if (!S.sound || document.hidden || !musicWanted) return;
     if (!music.src) setTrack(trackNo);
     const p = music.play(); if (p && p.catch) p.catch(() => {});
   }
-  function startMusic() { if (musicStarted) return; musicStarted = true; playMusic(); }
-  document.addEventListener('pointerdown', startMusic, { passive: true });
-  document.addEventListener('keydown', startMusic);
+  function unlockSound() {
+    if (!S.sound) return;
+    if (ac && ac.state === 'suspended') ac.resume();
+    musicWanted = true;
+    if (music.paused) playMusic();
+  }
+  ['pointerup', 'touchend', 'click', 'keydown'].forEach(t => document.addEventListener(t, unlockSound, { passive: true }));
 
   // ---------- colors ----------
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -1296,7 +1301,8 @@ import * as Rules from './rules.js?v=2';
     if (saveAcc > 2) { saveAcc = 0; save(); }
     // To the server every SYNC_COINS coins; strokes without coins at least every SYNC_IDLE_SEC, so the session stays open
     netAcc += dt;
-    if (net && !net.dead && !net.busy && now >= net.retryAt && (pend.coins >= Rules.SYNC_COINS || (pend.strokes && netAcc >= Rules.SYNC_IDLE_SEC))) flush();
+    if (net && net.closed && !net.dead && !net.busy && now >= net.retryAt) resume();
+    if (net && !net.closed && !net.dead && !net.busy && now >= net.retryAt && (pend.coins >= Rules.SYNC_COINS || (pend.strokes && netAcc >= Rules.SYNC_IDLE_SEC))) flush();
     if (dirty) render();
 
     if (petals.length) drawPetals(dt);
@@ -1329,11 +1335,12 @@ import * as Rules from './rules.js?v=2';
     if (maxed(it) || S.coins < c) return;
     if (net) {
       if (net.dead) return toast(LOST);
+      if (net.closed) return toast('Подключаюсь к серверу игры, попробуй через секунду');
       b.disabled = true;
       flush();
       queue(async () => {
         const r = await call('buy', { item: it.id });
-        if (r.closed) return lost();
+        if (r.closed) { net.closed = true; dirty = true; return toast('Подключаюсь к серверу игры, попробуй ещё раз'); }
         if (typeof r.balance === 'number') fromServer(r);
         if (r.error) toast(r.error); else bought(b);
         dirty = true;
@@ -1406,25 +1413,38 @@ import * as Rules from './rules.js?v=2';
     dirty = true;
   }
   function flush() {
-    if (!net || net.dead) return Promise.resolve();
+    if (!net || net.dead || net.closed) return Promise.resolve();
     return queue(async () => {
       if (!pend.strokes && !pend.fills) return;
       const sent = { ...pend };
       pend.strokes = pend.fills = pend.coins = 0; netAcc = 0;
       const r = await call('sync', { strokes: sent.strokes, fills: sent.fills, best: S.bestStreak });
-      if (r.closed) return lost();
+      // The session was closed meanwhile: the strokes wait for the resumed one
+      if (r.closed) { pend.strokes += sent.strokes; pend.fills += sent.fills; pend.coins += sent.coins; net.closed = true; return; }
       // Not taken: back into the queue, the next try in 10 s rather than on every frame
       if (r.error) { pend.strokes += sent.strokes; pend.fills += sent.fills; pend.coins += sent.coins; net.retryAt = performance.now() + 10000; return; }
       fromServer(r);
     });
   }
   function lost() { net.dead = true; toast(LOST, 5000); }
-  // The page goes away: the last strokes and the end of the session in one request that outlives it
+  // The page is hidden or goes away: the last strokes and the end of the session in one request that outlives it.
+  // The messenger closes a mini app without pagehide, only hiding it, so hidden is the moment to tell the server.
   function closeNet() {
-    if (!net || net.dead) return;
-    net.dead = true;
+    if (!net || net.dead || net.closed) return;
+    net.closed = true;
     const body = JSON.stringify({ game: net.token, sid: net.sid, strokes: pend.strokes, fills: pend.fills, best: S.bestStreak });
+    pend.strokes = pend.fills = pend.coins = 0;
     try { navigator.sendBeacon(apiUrl('close'), new Blob([body], { type: 'text/plain' })); } catch (e) {}
+  }
+  // Shown again after closeNet: a new session with the old key, quietly. Too late or taken over: no more coins here.
+  function resume() {
+    queue(async () => {
+      if (!net.closed || net.dead) return;
+      const r = await call('resume');
+      if (r.sid) { net.sid = r.sid; net.closed = false; fromServer(r); return; }
+      if (r.closed) return lost();
+      net.retryAt = performance.now() + 10000;
+    });
   }
 
   // ---------- mobile sheet ----------
@@ -1452,12 +1472,12 @@ import * as Rules from './rules.js?v=2';
   function setSnd() { $('#sndBtn').setAttribute('aria-pressed', S.sound ? 'true' : 'false'); }
   $('#sndBtn').addEventListener('click', () => {
     S.sound = !S.sound; setSnd(); save();
-    if (S.sound) { ding(); startMusic(); playMusic(); } else music.pause();
+    if (S.sound) { ding(); unlockSound(); } else music.pause();
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { save(); music.pause(); flush(); }
-    else playMusic();
+    if (document.hidden) { save(); music.pause(); closeNet(); }
+    else { playMusic(); if (net && net.closed && !net.dead) resume(); }
   });
   addEventListener('pagehide', () => { save(); closeNet(); });
   let rt = 0;
@@ -1483,7 +1503,7 @@ import * as Rules from './rules.js?v=2';
     const host = new URLSearchParams(location.search).get('api') || '';
     const token = tg?.initDataUnsafe?.start_param || '';
     if (tg?.initData && token && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(host)) {
-      net = { host, token, sid: '', busy: false, dead: false, retryAt: 0 };
+      net = { host, token, sid: '', busy: false, dead: false, closed: false, retryAt: 0 };
       keepLocal = false;
       const r = await call('open', { initData: tg.initData });
       if (r.sid) {
