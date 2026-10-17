@@ -8,17 +8,11 @@ export const DRAIN_BASE = 0.7;      // seconds per bead lost while out of tempo
 
 // When the page sends: every SYNC_FILLS full rows, after SYNC_IDLE_SEC if only strokes without coins wait,
 // before a purchase and once when the game is hidden. Nothing while nobody rubs.
-// The server quietly closes a session after IDLE_SEC without a request (the hourly cron checks).
-export const SYNC_FILLS = 20;
+// The server takes the strokes and rows as sent and quietly closes a session after IDLE_SEC without a request
+// (the hourly cron checks).
+export const SYNC_FILLS = 5;
 export const SYNC_IDLE_SEC = 300;
 export const IDLE_SEC = 3600;
-
-// What the server accepts: from the start of a session strokes and full bead rows add up at these rates,
-// whatever comes is taken from that, so a macro gets no more than a hand in tempo could rub in the same time.
-// What was not used is kept for up to ROOM_MAX_SEC worth.
-export const STROKES_PER_SEC = 10;                              // strokes of any tempo
-export const FILLS_PER_SEC = TEMPO_MAX / STROKES_PER_COIN;      // full bead rows
-export const ROOM_MAX_SEC = 3600;
 
 // The shop. lv is { silk, oil, emp, goldCloth, whiteJade }: how many of each are bought.
 // cost of the next one = base * k^level, max is the most one can buy.
